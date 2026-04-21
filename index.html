@@ -3,507 +3,12 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Word Problems ('As Many As', 'Twice As Many' etc...)</title>
+  <title>Word Problems (2 Types Mixed)</title>
   <style>
-    :root{
-      --bg:#f6fbf1;
-      --card:#ffffff;
-      --ink:#203225;
-      --soft:#5d755f;
-      --green:#9bd56e;
-      --green-dark:#3f7d2a;
-      --mint:#dff4df;
-      --blue:#cfe9ff;
-      --blue-deep:#7eb7e6;
-      --pink:#ffd7d7;
-      --pink-deep:#e69494;
-      --gold:#ffe589;
-      --line:#cfe5c4;
-      --danger:#d85c5c;
-      --ok:#2a9d55;
-      --shadow:0 10px 28px rgba(50,90,50,.10);
-      --unit-w:clamp(34px, 7vw, 50px);
-      --unit-h:34px;
-      --radius:18px;
-      --font:"Comic Sans MS","Comic Sans","Trebuchet MS",sans-serif;
-    }
-
-    *{box-sizing:border-box}
-    html,body{
-      width:100%;
-      height:100%;
-      margin:0;
-      padding:0;
-      overflow:hidden;
-      background:linear-gradient(180deg,#f4fbef 0%, #edf8ee 100%);
-      color:var(--ink);
-      font-family:var(--font);
-    }
-    body{
-      position:fixed;
-      inset:0;
-      overscroll-behavior:none;
-      touch-action:manipulation;
-    }
-    .fit-viewport{
-      position:fixed;
-      inset:0;
-      overflow:hidden;
-      display:flex;
-      justify-content:center;
-      align-items:flex-start;
-      padding:0;
-      background:linear-gradient(180deg,#f4fbef 0%, #edf8ee 100%);
-    }
-    .fit-stage{
-      position:relative;
-      left:auto;
-      top:auto;
-      transform-origin:top center;
-      will-change:transform;
-      width:100%;
-    }
-    .page{
-      width:calc(100vw - 8px);
-      max-width:none;
-      margin:0 auto;
-      padding:8px 4px 12px;
-    }
-
-    .hero{
-      background:var(--card);
-      border:3px solid var(--line);
-      border-radius:24px;
-      box-shadow:var(--shadow);
-      padding:18px;
-      margin-bottom:14px;
-    }
-    .hero-top{display:flex;gap:14px;align-items:center;justify-content:space-between;flex-wrap:wrap}
-    .title-wrap h1{margin:0;font-size:clamp(28px,4vw,42px);line-height:1.05;color:var(--green-dark)}
-    .title-wrap p{margin:8px 0 0;font-size:16px;color:var(--soft)}
-    .scoreboard{display:flex;gap:10px;flex-wrap:wrap}
-    .pill{
-      background:#eef8e9;
-      color:var(--green-dark);
-      border:2px solid #cfe5c4;
-      border-radius:999px;
-      padding:10px 14px;
-      font-weight:700;
-      min-width:120px;
-      text-align:center;
-    }
-
-    .mode-bar{
-      margin-top:14px;
-      display:flex;
-      gap:10px;
-      flex-wrap:wrap;
-    }
-    .mode-btn{
-      appearance:none;
-      border:none;
-      background:#e6f4de;
-      color:var(--green-dark);
-      padding:12px 16px;
-      border-radius:14px;
-      font:700 16px var(--font);
-      cursor:pointer;
-      border:2px solid #c9e0bc;
-      box-shadow:0 4px 0 rgba(90,135,75,.12);
-    }
-    .mode-btn.active{background:var(--green);border-color:#84bf59;transform:translateY(1px)}
-
-    .main-grid{
-      display:grid;
-      grid-template-columns:1.34fr .86fr;
-      gap:16px;
-      align-items:stretch;
-    }
-
-    .card{
-      background:var(--card);
-      border:3px solid var(--line);
-      border-radius:24px;
-      box-shadow:var(--shadow);
-      padding:16px;
-    }
-
-    #leftCard{
-      display:flex;
-      flex-direction:column;
-      min-height:100%;
-    }
-
-    .type-badge{
-      display:inline-flex;
-      align-items:center;
-      gap:8px;
-      background:#edf8e8;
-      border:2px solid #cfe5c4;
-      color:var(--green-dark);
-      border-radius:999px;
-      padding:8px 12px;
-      font-weight:700;
-      margin-bottom:10px;
-    }
-
-    .question-text{
-      font-size:clamp(20px,2.3vw,29px);
-      line-height:1.35;
-      font-weight:700;
-      margin:0 0 12px;
-    }
-    .mini-note{font-size:15px;color:var(--soft);margin:0 0 12px}
-
-    .builder-note{
-      background:#f3f9ff;
-      border:2px dashed #b7d5ef;
-      color:#366a90;
-      border-radius:16px;
-      padding:10px 12px;
-      font-size:15px;
-      margin-bottom:14px;
-    }
-
-    .model-area{
-      display:grid;
-      gap:10px;
-      align-content:start;
-      padding-bottom:34px;
-      flex:1;
-      margin-top:35px;
-      position:relative;
-    }
-    .model-area.side-total-layout{padding-right:100px}
-    .model-area.type1-layout > .model-row:nth-of-type(2){transform:translateY(-75px)}
-    .model-area.type2-layout > .model-row:nth-of-type(2){transform:translateY(-75px)}
-    .model-area.type3-layout{padding-right:100px}
-    .model-area.type3-layout > .model-row:nth-of-type(2){transform:translateY(-73px)}
-    .type3-side-anchor{position:absolute;display:none;pointer-events:none;z-index:3;width:96px}
-    .type3-side-anchor.show{display:block}
-    .type3-side-brace-wrap{position:absolute;display:none;pointer-events:none;z-index:1;width:28px}
-    .type3-side-brace-wrap.show{display:block}
-    .type3-side-brace-svg{display:block;width:100%;height:100%;overflow:visible}
-    .type3-side-brace-path{fill:none;stroke:#222;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round}
-    .type3-side-label-target{
-      position:absolute;
-      width:56px;min-width:56px;height:28px;min-height:28px;
-      border:2px dashed #cfdcc8;border-radius:10px;background:#f8fcf4;
-      display:none;align-items:center;justify-content:center;z-index:2;
-    }
-    .type3-side-label-target.show{display:flex}
-    .type3-side-label-target.over{border-color:#7fc05f;background:#f4fee8;outline:4px solid rgba(123,190,95,.18)}
-    .type3-side-label-target.right{border-color:#9bd56e;background:#f6fff0}
-    .type3-side-label-target.wrong{border-color:#efabab;background:#fff7f7}
-    .type3-side-label-target.filled{border-style:solid;border-color:#b9ccae;background:#fffef4;cursor:pointer}
-    .type3-partwhole{
-      display:none;
-      margin-top:10px;
-      padding:16px 12px 8px;
-      border-top:2px dashed #dbe7d2;
-    }
-    .type3-partwhole.show{display:block}
-    .type3-step-caption{font-size:15px;color:var(--soft);font-weight:700;margin-bottom:8px}
-    .type3-whole-block{position:relative;padding-top:28px;width:min(360px, calc(100% - 52px));margin-left:78px}
-    .type3-whole-label{position:absolute;top:-30px;left:50%;transform:translateX(-50%);font-size:30px;font-weight:700;color:#222}
-    .type3-whole-brace{position:absolute;left:0;right:0;top:12px;height:24px;pointer-events:none}
-    .type3-partwhole-bar{
-      display:grid;
-      min-height:34px;
-      border-radius:7px;
-      overflow:hidden;
-      width:100%;
-      border:2px solid rgba(0,0,0,.18);
-      box-shadow:inset 0 -2px 0 rgba(255,255,255,.55);
-    }
-    .type3-partwhole-seg{min-height:34px; position:relative}
-    .type3-partwhole-seg + .type3-partwhole-seg{border-left:2px solid rgba(0,0,0,.18)}
-    .type3-partwhole-seg.start{background:#e6dc59}
-    .type3-partwhole-seg.extra{background:#a9cf36}
-    .type3-partwhole-labels{display:grid;gap:0;margin-top:8px;width:min(360px, calc(100% - 52px));margin-left:78px}
-    .type3-partwhole-chip{font-size:18px;font-weight:700;color:#35503a;text-align:center}
-    .type3-partwhole-chip.extra{color:#4d6517}
-    .model-row{
-      display:grid;
-      grid-template-columns:minmax(88px,110px) 1fr;
-      gap:10px;
-      align-items:center;
-    }
-    .row-label{
-      min-height:48px;
-      border-radius:14px;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      font-size:20px;
-      font-weight:700;
-      padding:10px 8px;
-      border:2px solid rgba(0,0,0,.08);
-      margin-top:26px;
-      align-self:start;
-    }
-    .row-label.top{background:var(--pink)}
-    .row-label.bottom{background:var(--blue)}
-
-    .drop-shell{display:grid;gap:0;position:relative}
-    .annot-wrap{
-      position:relative;
-      padding-top:30px;
-      padding-bottom:34px;
-      min-height:134px;
-    }
-    .drop-zone{
-      min-height:68px;
-      background:#fbfdf8;
-      border:3px dashed #c8ddbc;
-      border-radius:16px;
-      padding:12px 10px;
-      display:flex;
-      align-items:center;
-      gap:0;
-      overflow:visible;
-      position:relative;
-    }
-    .drop-zone.over{outline:4px solid rgba(123,190,95,.18);border-color:#7fc05f;background:#f4fee8}
-    .drop-zone.wrong{border-color:#efabab;background:#fff7f7}
-    .drop-zone.right{border-color:#9bd56e;background:#f6fff0}
-    .row-helper{display:none}
-    .label-target{
-      position:absolute;
-      width:56px;min-width:56px;height:28px;min-height:28px;
-      border:2px dashed #cfdcc8;border-radius:10px;background:#f8fcf4;
-      display:none;align-items:center;justify-content:center;z-index:2;
-    }
-    .label-target.show{display:flex}
-    .label-target.over{border-color:#7fc05f;background:#f4fee8;outline:4px solid rgba(123,190,95,.18)}
-    .label-target.right{border-color:#9bd56e;background:#f6fff0}
-    .label-target.wrong{border-color:#efabab;background:#fff7f7}
-    .label-target.filled{border-style:solid;border-color:#b9ccae;background:#fffef4;cursor:pointer}
-    .placed-tag{display:inline-flex;align-items:center;justify-content:center;width:100%;height:100%;padding:0 6px;border-radius:8px;background:linear-gradient(180deg,#fff8d9 0%, #ffefad 100%);color:#70590b;font-size:18px;line-height:1;font-weight:700;box-shadow:inset 0 -2px 0 rgba(255,255,255,.55)}
-    .brace-line-wrap{position:absolute;display:none;pointer-events:none;z-index:1}
-    .brace-line-wrap.show{display:block}
-    .brace-svg{display:block;width:100%;height:24px;overflow:visible}
-    .brace-path{fill:none;stroke:#222;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round}
-    .palette-tag{
-      min-width:74px;height:46px;padding:0 14px;border-radius:12px;border:3px solid #d9ca7f;background:linear-gradient(180deg,#fff7ca 0%, #ffea96 100%);
-      display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;color:#70590b;cursor:grab;touch-action:none;user-select:none;
-      box-shadow:0 6px 0 rgba(150,128,34,.16);
-    }
-    .palette-tag:active{cursor:grabbing}
-    .ghost-tag{position:fixed;min-width:74px;height:46px;padding:0 14px;border-radius:12px;border:3px solid #d9ca7f;background:linear-gradient(180deg,#fff7ca 0%, #ffea96 100%);display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;color:#70590b;pointer-events:none;z-index:9999;transform:translate(-50%,-50%) rotate(-4deg);box-shadow:0 12px 24px rgba(0,0,0,.18)}
-
-    .model-unit{
-      flex:0 0 auto;
-      width:var(--unit-w);
-      height:var(--unit-h);
-      border-radius:7px;
-      border:2px solid rgba(0,0,0,.18);
-      box-shadow:inset 0 -2px 0 rgba(255,255,255,.55);
-      cursor:pointer;
-      position:relative;
-    }
-    .model-unit::after{
-      content:"1 unit";
-      position:absolute;
-      inset:0;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      font-size:11px;
-      font-weight:700;
-      opacity:.72;
-    }
-    .model-unit.top{background:#f2a7a7}
-    .model-unit.bottom{background:#95caf0}
-
-    .right-col{display:grid;gap:14px}
-
-    .toolbox{
-      display:grid;
-      grid-template-columns:1fr;
-      gap:12px;
-      align-items:start;
-    }
-    .tool-row{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
-    .palette-unit{
-      width:84px;
-      height:52px;
-      border-radius:12px;
-      border:3px solid #92c96a;
-      background:linear-gradient(180deg,#d9f5b8 0%, #c1eb92 100%);
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      font-size:16px;
-      font-weight:700;
-      color:#305d1f;
-      cursor:grab;
-      touch-action:none;
-      user-select:none;
-      box-shadow:0 6px 0 rgba(107,157,72,.18);
-    }
-    .palette-unit:active{cursor:grabbing}
-    .ghost-unit{
-      position:fixed;
-      width:84px;
-      height:52px;
-      border-radius:12px;
-      border:3px solid #92c96a;
-      background:linear-gradient(180deg,#d9f5b8 0%, #c1eb92 100%);
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      font-size:16px;
-      font-weight:700;
-      color:#305d1f;
-      pointer-events:none;
-      z-index:9999;
-      transform:translate(-50%,-50%) rotate(-4deg);
-      box-shadow:0 12px 24px rgba(0,0,0,.18);
-    }
-
-    .btn-row{display:flex;gap:10px;flex-wrap:wrap}
-    .btn{
-      appearance:none;
-      border:none;
-      cursor:pointer;
-      padding:13px 16px;
-      border-radius:14px;
-      font:700 17px var(--font);
-      box-shadow:0 5px 0 rgba(0,0,0,.08);
-    }
-    .btn.primary{background:#8dd55d;color:#20440f}
-    .btn.secondary{background:#d8edf9;color:#275777}
-    .btn.warn{background:#ffe3a7;color:#6b5010}
-    .btn[disabled]{opacity:.55;cursor:not-allowed}
-
-    .equation-wrap{display:grid;gap:10px}
-    .eq-card{
-      background:#f1fbfb;
-      border:2px solid #d1ecec;
-      border-radius:18px;
-      padding:14px;
-      display:grid;
-      gap:10px;
-    }
-    .eq-line{
-      font-size:clamp(19px,2vw,24px);
-      line-height:1.45;
-      font-weight:700;
-      display:flex;
-      align-items:center;
-      gap:8px;
-      flex-wrap:wrap;
-    }
-    .eq-indent-text,
-    .eq-indent,
-    .eq-label,
-    .eq-spacer{
-      display:inline-block;
-      width:92px;
-      min-width:92px;
-      text-align:left;
-    }
-    .eq-indent{
-      visibility:hidden;
-      pointer-events:none;
-    }
-    .eq-spacer{
-      visibility:hidden;
-      pointer-events:none;
-    }
-    .eq-symbol{
-      display:inline-block;
-      width:20px;
-      min-width:20px;
-      text-align:center;
-    }
-    .eq-under-units{
-      display:inline-block;
-      width:136px;
-      min-width:136px;
-      pointer-events:none;
-    }
-    .blank{
-      width:82px;
-      min-width:82px;
-      height:42px;
-      border-radius:12px;
-      border:2px solid #a9d08f;
-      background:#fffef4;
-      text-align:center;
-      font:700 20px var(--font);
-      color:var(--ink);
-      padding:4px 8px;
-    }
-    .blank.small{width:70px;min-width:70px}
-
-    .eq-chip{
-      display:inline-flex;
-      align-items:center;
-      min-height:42px;
-      padding:6px 14px;
-      border-radius:14px;
-      background:#dff0f2;
-      border:2px solid #c8e3e7;
-      color:#1f4755;
-      font-weight:700;
-    }
-    .eq-chip-ghost{
-      visibility:hidden;
-      pointer-events:none;
-    }
-    .eq-symbol-stack{
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      width:20px;
-      min-width:20px;
-      font-weight:700;
-    }
-    .blank.wrong{border-color:#df6f6f;background:#fff5f5}
-    .blank.right{border-color:#6bb553;background:#f5fff1}
-
-    .feedback{
-      border-radius:18px;
-      padding:14px;
-      font-size:18px;
-      font-weight:700;
-      min-height:62px;
-      display:flex;
-      align-items:center;
-      border:2px solid #d6e5cd;
-      background:#f7fbf2;
-      color:#466144;
-    }
-    .feedback.good{background:#eefceb;border-color:#9ad07f;color:#216b37}
-    .feedback.bad{background:#fff4f4;border-color:#ebb6b6;color:#9a3f3f}
-
-    .celebrate{
-      display:none;
-      font-size:36px;
-      text-align:center;
-      animation:pop .6s ease;
-      margin-top:4px;
-    }
-    .celebrate.show{display:block}
-    @keyframes pop{
-      0%{transform:scale(.6);opacity:0}
-      65%{transform:scale(1.12);opacity:1}
-      100%{transform:scale(1);opacity:1}
-    }
-
-
-    .mission-card{
-      margin-top:14px;
-      background:#f7fbff;
-      border:2px solid #cfe2f7;
-      border-radius:20px;
-      padding:12px 14px;
-      box-shadow:0 8px 18px rgba(50,90,50,.06);
-      display:grid;
-      gap:8px;
-    }
+    :root{--bg:#f6fbf1;--card:#ffffff;--ink:#203225;--soft:#5d755f;--green:#9bd56e;--green-dark:#3f7d2a;--mint:#dff4df;--blue:#cfe9ff;--blue-deep:#7eb7e6;--pink:#ffd7d7;--pink-deep:#e69494;--gold:#ffe589;--line:#cfe5c4;--danger:#d85c5c;--ok:#2a9d55;--shadow:0 10px 28px rgba(50,90,50,.10);--unit-w:68px;--unit-h:40px;--radius:18px;--font:"Comic Sans MS","Comic Sans","Trebuchet MS",sans-serif}
+    *{box-sizing:border-box}html,body{width:100%;height:100%;margin:0;padding:0;overflow:hidden;background:linear-gradient(180deg,#f4fbef 0%, #edf8ee 100%);color:var(--ink);font-family:var(--font)}body{position:fixed;inset:0;overscroll-behavior:none;touch-action:manipulation}.fit-viewport{position:fixed;inset:0;overflow:hidden;display:flex;justify-content:center;align-items:flex-start;padding-top:2px;background:linear-gradient(180deg,#f4fbef 0%, #edf8ee 100%)}.fit-stage{position:relative;transform-origin:top center;will-change:transform;width:100%}.page{width:calc(100vw - 8px);max-width:none;margin:0 auto;padding:8px 4px 12px}.hero,.card{background:var(--card);border:3px solid var(--line);border-radius:24px;box-shadow:var(--shadow)}.hero{padding:18px;margin-bottom:14px}.hero-top{display:flex;gap:14px;align-items:center;justify-content:space-between;flex-wrap:wrap}.title-wrap h1{margin:0;font-size:clamp(28px,4vw,42px);line-height:1.05;color:var(--green-dark)}.title-wrap p{margin:8px 0 0;font-size:16px;color:var(--soft)}.scoreboard{display:flex;gap:10px;flex-wrap:wrap}.pill{background:#eef8e9;color:var(--green-dark);border:2px solid #cfe5c4;border-radius:999px;padding:10px 14px;font-weight:700;min-width:120px;text-align:center;font-size:16px}.mode-bar{margin-top:14px;display:flex;gap:10px;flex-wrap:wrap}.mode-btn{appearance:none;border:none;background:#e6f4de;color:var(--green-dark);padding:12px 16px;border-radius:14px;font:700 16px var(--font);cursor:pointer;border:2px solid #c9e0bc;box-shadow:0 4px 0 rgba(90,135,75,.12)}    .mode-btn.active{background:var(--green);border-color:#84bf59;transform:translateY(1px)}
+    .mode-bar .mode-btn[data-mode="mixed"]{order:99}
+    .mission-card{margin:0 0 14px;background:#f7fbff;border:2px solid #cfe2f7;border-radius:20px;padding:12px 14px;box-shadow:0 8px 18px rgba(50,90,50,.06);display:grid;gap:8px}
     .mission-top{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
     .mission-title{font-size:18px;font-weight:700;color:#275777}
     .mission-meta{font-size:13px;color:#5d755f;font-weight:700}
@@ -514,1954 +19,258 @@
     .mission-stars{display:flex;gap:8px;align-items:center}
     .mission-star{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:#edf2f7;border:2px solid #d0dae6;font-size:17px;transition:transform .18s ease, background .18s ease, border-color .18s ease}
     .mission-star.on{background:#fff3be;border-color:#f3be3d;transform:translateY(-2px)}
-
-    .reward-screen{display:none;text-align:center;gap:14px;justify-items:center}
-    .reward-screen.show{display:grid}
-    .reward-badge{padding:8px 16px;border-radius:999px;background:#efe7ff;border:2px solid #d4c2ff;color:#6d28d9;font-weight:700}
-    .reward-screen h2{margin:0;font-size:38px;color:var(--green-dark)}
-    .reward-screen p{margin:0;font-size:22px}
-    .reward-pet-wrap{width:min(100%,360px);padding:18px;border-radius:28px;border:3px dashed #d8c8ff;background:#faf5ff;box-shadow:0 12px 28px rgba(109,40,217,.10);display:grid;gap:10px;justify-items:center}
-    .reward-pet-wrap img{width:min(100%,260px);height:auto;display:block;filter:drop-shadow(0 12px 20px rgba(0,0,0,.14))}
-    .reward-remark{font-size:18px;font-weight:700;color:#5b3d91;line-height:1.35}
-
-    .end-screen{
-      display:none;
-      text-align:center;
-      gap:12px;
-    }
-    .end-screen.show{display:grid}
-    .end-screen h2{margin:0;font-size:36px;color:var(--green-dark)}
-    .end-screen p{margin:0;font-size:22px}
-
-    footer{
-      margin-top:14px;
-      text-align:center;
-      color:var(--soft);
-      font-size:14px;
-      padding:8px 4px;
-    }
-
-
-    .main-grid{
-      display:grid;
-      grid-template-columns:1.18fr .86fr .72fr;
-      gap:14px;
-      align-items:stretch;
-    }
-
-    .panel-card{
-      display:flex;
-      flex-direction:column;
-      min-height:740px;
-    }
-
-    #modelCard{
-      gap:12px;
-    }
-
-    .model-area{
-      position:relative;
-      display:grid;
-      gap:10px;
-      align-content:start;
-      padding-bottom:12px;
-      flex:1;
-      margin-top:14px;
-    }
-
-    #toolCard{
-      gap:12px;
-    }
-
-    .tool-note{
-      font-size:15px;
-      color:var(--soft);
-      margin:-4px 0 0;
-    }
-
-    .subpanel{
-      background:#fbfef8;
-      border:2px solid #d6e8cd;
-      border-radius:18px;
-      padding:14px;
-    }
-
-    .tool-shell{
-      display:grid;
-      gap:12px;
-      flex:1;
-      min-height:0;
-    }
-
-    .equation-wrap{
-      display:grid;
-      gap:10px;
-      flex:1;
-      align-content:start;
-    }
-
-    .work-card{
-      display:flex;
-      flex-direction:column;
-      min-height:740px;
-    }
-
-    .work-head{
-      display:flex;
-      justify-content:space-between;
-      align-items:flex-start;
-      gap:12px;
-      margin-bottom:10px;
-      flex-wrap:wrap;
-    }
-
-    .work-note{
-      font-size:15px;
-      color:var(--soft);
-    }
-
-    .work-area{
-      position:relative;
-      flex:1;
-      min-height:670px;
-      border:2px solid #d9e2d2;
-      border-radius:18px;
-      background:#fff;
-      overflow:hidden;
-    }
-
-    .place-grid{
-      position:absolute;
-      inset:0;
-      pointer-events:none;
-      z-index:1;
-    }
-
-    .place-head{
-      position:absolute;
-      left:18px;
-      top:12px;
-      width:224px;
-      display:grid;
-      grid-template-columns:repeat(4,56px);
-    }
-
-    .place-head span{
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      color:rgba(120,120,120,.58);
-      font-size:20px;
-      font-weight:700;
-      letter-spacing:.5px;
-    }
-
-    .place-vert{
-      position:absolute;
-      top:42px;
-      bottom:12px;
-      width:1px;
-      background:rgba(145,145,145,.18);
-    }
-
-    .place-rows{
-      position:absolute;
-      left:0;
-      right:0;
-      top:44px;
-      bottom:0;
-      display:grid;
-      grid-template-rows:repeat(9, 1fr);
-      padding:0 14px 12px;
-    }
-
-    .place-row{
-      position:relative;
-    }
-
-    .place-line{
-      position:absolute;
-      left:0;
-      right:0;
-      bottom:8px;
-      border-bottom:1px solid rgba(145,145,145,.18);
-    }
-
-    #workingCanvas{
-      position:absolute;
-      inset:0;
-      width:100%;
-      height:100%;
-      touch-action:none;
-      cursor:crosshair;
-      z-index:2;
-    }
-
-    @media (max-width: 1180px){
-      .main-grid{grid-template-columns:1fr}
-      .panel-card,.work-card{min-height:auto}
-      .work-area{min-height:420px}
-    }
-
-    @media (max-width: 560px){
-      .page{padding:12px 10px 18px}
-      .hero,.card{padding:14px}
-      .model-row{grid-template-columns:1fr;gap:8px}
-      .row-label{min-height:40px;font-size:18px;margin-top:0}
-      .eq-line{font-size:18px}
-      .blank{width:72px;min-width:72px;height:40px;font-size:19px}
-      .palette-unit,.ghost-unit{width:78px;height:50px}
-    }
+    .reward-screen{display:none;min-height:760px;align-items:center;justify-content:center;text-align:center}
+    .reward-screen.show{display:flex}
+    .reward-box{width:min(760px,100%);background:#fff;border:3px solid #cfe5c4;border-radius:28px;box-shadow:var(--shadow);padding:24px 20px;display:grid;gap:14px;justify-items:center}
+    .reward-badge{padding:8px 16px;border-radius:999px;background:#fff4c8;border:2px solid #e7c95b;color:#77580d;font-weight:700}
+    .reward-title{font-size:40px;line-height:1.05;color:var(--green-dark);font-weight:700}
+    .reward-sub{font-size:22px;line-height:1.35;color:#35503a;font-weight:700}
+    .reward-stars-big{font-size:46px;line-height:1}
+    .main-grid{display:grid;grid-template-columns:1.10fr .96fr .54fr;gap:16px;align-items:stretch}.panel-card{display:flex;flex-direction:column;min-height:760px}.card{padding:16px}.type-badge{display:inline-flex;align-items:center;gap:8px;background:#edf8e8;border:2px solid #cfe5c4;color:var(--green-dark);border-radius:999px;padding:8px 12px;font-weight:700;margin-bottom:10px;font-size:18px}.question-text{font-size:clamp(22px,2.2vw,31px);line-height:1.35;font-weight:700;margin:0 0 12px}.mini-note{font-size:15px;color:var(--soft);margin:0 0 12px}.builder-note{background:#f3f9ff;border:2px dashed #b7d5ef;color:#366a90;border-radius:16px;padding:10px 12px;font-size:15px;margin-bottom:14px}
+    #modelCard{gap:12px}.model-area{position:relative;display:grid;gap:12px;align-content:start;padding-bottom:12px;flex:1;margin-top:10px}.model-shell{position:relative;min-height:420px;border-top:2px dashed #dbe7d2;padding-top:18px}.model-row{display:grid;grid-template-columns:92px 1fr;gap:12px;align-items:center;margin-bottom:26px}.model-row.bottom-tight{margin-top:-75px}.row-label{min-height:48px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:700;padding:10px 8px;border:2px solid rgba(0,0,0,.08)}.row-label.top{background:var(--pink)}.row-label.bottom{background:var(--blue)}.bar-wrap{position:relative;min-height:124px}.bar-stage{position:relative;min-height:124px;padding-top:46px;padding-bottom:46px;overflow:visible}.bar-zone{position:relative;min-height:62px;border:3px dashed #c8ddbc;border-radius:16px;background:#fbfdf8;padding:8px 10px;display:flex;align-items:center;overflow:visible}.bar-zone.over{outline:4px solid rgba(123,190,95,.18);border-color:#7fc05f;background:#f4fee8}.bar-zone.right{border-color:#9bd56e;background:#f6fff0}.bar-zone.wrong{border-color:#efabab;background:#fff7f7}.bar-track{position:relative;display:flex;align-items:center;gap:0}.slot{width:var(--unit-w);height:var(--unit-h);border:2px solid rgba(0,0,0,.18);position:relative;box-shadow:inset 0 -2px 0 rgba(255,255,255,.55);flex:0 0 auto}.slot:first-child{border-top-left-radius:8px;border-bottom-left-radius:8px}.slot:last-child{border-top-right-radius:8px;border-bottom-right-radius:8px}.slot+.slot{margin-left:-2px}.slot.fixed{background:#b999c0}.slot.group{background:#a9cf36}.slot.type2-give{background:#e8e060}.slot.type2-rest{background:#e7a39b}.slot.empty{background:transparent;border-style:dashed;border-color:#b9ccae;box-shadow:none}
+    .label-target{position:absolute;width:58px;min-width:58px;height:30px;border:2px dashed #cfdcc8;border-radius:10px;background:#f8fcf4;display:none;align-items:center;justify-content:center;z-index:5}.label-target.show{display:flex}.label-target.over{border-color:#7fc05f;background:#f4fee8;outline:4px solid rgba(123,190,95,.18)}.label-target.right{border-color:#9bd56e;background:#f6fff0}.label-target.wrong{border-color:#efabab;background:#fff7f7}.label-target.filled{border-style:solid;border-color:#b9ccae;background:#fffef4;cursor:pointer}.placed-tag{display:inline-flex;align-items:center;justify-content:center;width:100%;height:100%;padding:0 6px;border-radius:8px;background:linear-gradient(180deg,#fff8d9 0%, #ffefad 100%);color:#70590b;font-size:18px;line-height:1;font-weight:700;box-shadow:inset 0 -2px 0 rgba(255,255,255,.55)}.brace-wrap{position:absolute;display:none;pointer-events:none;z-index:3}.brace-wrap.show{display:block}.brace-svg{display:block;width:100%;height:26px;overflow:visible}.brace-path{fill:none;stroke:#222;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round}
+    #toolCard{gap:12px}.tool-note{font-size:15px;color:var(--soft);margin:-4px 0 0}.tool-shell{display:grid;gap:12px;flex:1;min-height:0}.subpanel{background:#fbfef8;border:2px solid #d6e8cd;border-radius:18px;padding:14px}.toolbox{display:grid;grid-template-columns:1fr;gap:12px;align-items:start}.tool-row{display:flex;gap:12px;align-items:center;flex-wrap:wrap}.palette-unit{width:84px;height:52px;border-radius:12px;border:3px solid #92c96a;background:linear-gradient(180deg,#d9f5b8 0%, #c1eb92 100%);display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;color:#305d1f;cursor:grab;touch-action:none;user-select:none;box-shadow:0 6px 0 rgba(107,157,72,.18)}.palette-unit:active,.palette-tag:active{cursor:grabbing}.palette-tag{min-width:74px;height:46px;padding:0 14px;border-radius:12px;border:3px solid #d9ca7f;background:linear-gradient(180deg,#fff7ca 0%, #ffea96 100%);display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;color:#70590b;cursor:grab;touch-action:none;user-select:none;box-shadow:0 6px 0 rgba(150,128,34,.16)}.ghost-unit{position:fixed;width:84px;height:52px;border-radius:12px;border:3px solid #92c96a;background:linear-gradient(180deg,#d9f5b8 0%, #c1eb92 100%);display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;color:#305d1f;pointer-events:none;z-index:9999;transform:translate(-50%,-50%) rotate(-4deg);box-shadow:0 12px 24px rgba(0,0,0,.18)}.ghost-tag{position:fixed;min-width:74px;height:46px;padding:0 14px;border-radius:12px;border:3px solid #d9ca7f;background:linear-gradient(180deg,#fff7ca 0%, #ffea96 100%);display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;color:#70590b;pointer-events:none;z-index:9999;transform:translate(-50%,-50%) rotate(-4deg);box-shadow:0 12px 24px rgba(0,0,0,.18)}.btn-row{display:flex;gap:10px;flex-wrap:wrap}.btn{appearance:none;border:none;cursor:pointer;padding:13px 16px;border-radius:14px;font:700 17px var(--font);box-shadow:0 5px 0 rgba(0,0,0,.08)}.btn.primary{background:#8dd55d;color:#20440f}.btn.secondary{background:#d8edf9;color:#275777}.btn.warn{background:#ffe3a7;color:#6b5010}.btn[disabled]{opacity:.55;cursor:not-allowed}
+    .equation-wrap{display:grid;gap:10px;flex:1;align-content:start}.eq-card{background:#f1fbfb;border:2px solid #d1ecec;border-radius:18px;padding:14px;display:grid;gap:12px}.eq-line{font-size:clamp(20px,2vw,26px);line-height:1.45;font-weight:700;display:flex;align-items:center;gap:10px;flex-wrap:wrap}.eq-chip{display:inline-flex;align-items:center;min-height:42px;padding:6px 14px;border-radius:14px;background:#dff0f2;border:2px solid #c8e3e7;color:#1f4755;font-weight:700}.eq-chip-ghost{visibility:hidden;pointer-events:none}.eq-symbol-stack{display:inline-flex;align-items:center;justify-content:center;width:24px;min-width:24px;font-weight:700;color:var(--ink)}.blank{width:92px;min-width:92px;height:44px;border-radius:12px;border:2px solid #a9d08f;background:#fffef4;text-align:center;font:700 21px var(--font);color:var(--ink);padding:4px 8px}.blank.small{width:76px;min-width:76px}.blank.wrong{border-color:#df6f6f;background:#fff5f5}.blank.right{border-color:#6bb553;background:#f5fff1}.op-circle{width:40px;height:40px;border-radius:50%;border:2px solid #a9c08c;background:#eef7df;display:inline-flex;align-items:center;justify-content:center;font-size:24px;line-height:1;color:#4d6517;font-weight:700}.feedback{border-radius:18px;padding:14px;font-size:18px;font-weight:700;min-height:62px;display:flex;align-items:center;border:2px solid #d6e5cd;background:#f7fbf2;color:#466144}.feedback.good{background:#eefceb;border-color:#9ad07f;color:#216b37}.feedback.bad{background:#fff4f4;border-color:#ebb6b6;color:#9a3f3f}.celebrate{display:none;font-size:36px;text-align:center;animation:pop .6s ease;margin-top:4px}.celebrate.show{display:block}@keyframes pop{0%{transform:scale(.6);opacity:0}65%{transform:scale(1.12);opacity:1}100%{transform:scale(1);opacity:1}}
+    .work-card{display:flex;flex-direction:column;min-height:760px}.work-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:10px;flex-wrap:wrap}.work-note{font-size:15px;color:var(--soft)}.work-area{position:relative;flex:1;min-height:690px;border:2px solid #d9e2d2;border-radius:18px;background:#fff;overflow:hidden}.place-grid{position:absolute;inset:0;pointer-events:none;z-index:1}.place-head{position:absolute;left:74px;top:12px;width:168px;display:grid;grid-template-columns:repeat(3,56px)}.place-head span{display:flex;align-items:center;justify-content:center;color:rgba(120,120,120,.58);font-size:20px;font-weight:700;letter-spacing:.5px}.place-vert{position:absolute;top:42px;bottom:12px;width:1px;background:rgba(145,145,145,.18)}.place-rows{position:absolute;left:0;right:0;top:44px;bottom:0;display:grid;grid-template-rows:repeat(9,1fr);padding:0 14px 12px}.place-row{position:relative}.place-line{position:absolute;left:0;right:0;bottom:8px;border-bottom:1px solid rgba(145,145,145,.18)}#workingCanvas{position:absolute;inset:0;width:100%;height:100%;touch-action:none;cursor:crosshair;z-index:2}.end-screen{display:none;text-align:center;gap:12px}.end-screen.show{display:grid}.end-screen h2{margin:0;font-size:36px;color:var(--green-dark)}.end-screen p{margin:0;font-size:22px}footer{margin-top:14px;text-align:center;color:var(--soft);font-size:14px;padding:8px 4px}@media (max-width:1180px){.main-grid{grid-template-columns:1fr}.panel-card,.work-card{min-height:auto}.work-area{min-height:420px}}@media (max-width:560px){.page{padding:12px 10px 18px}.hero,.card{padding:14px}.blank{width:80px;min-width:80px;height:42px;font-size:20px}.palette-unit,.ghost-unit{width:78px;height:50px}}
   </style>
-  <script src="https://cdn.counter.dev/script.js" data-id="825e93b6-ce99-40ef-8bcc-125f13297433" data-utcoffset="8"></script>
 </head>
 <body>
-  <div class="fit-viewport" id="fitViewport">
-    <div class="fit-stage" id="fitStage">
-      <div class="page">
-    <section class="hero">
-      <div class="hero-top">
-        <div class="title-wrap">
-          <h1>Word Problems ('As Many As')</h1>
-          <p>Drag the unit blocks, build the model, then fill in the equation blanks.</p>
-        </div>
-        <div class="scoreboard">
-          <div class="pill" id="modePill">Mode: Mixed</div>
-          <div class="pill" id="progressPill">Question 1 / 6</div>
-          <div class="pill" id="scorePill">Score: 0</div>
-        </div>
-      </div>
-      <div class="mode-bar">
-        <button class="mode-btn active" data-mode="type1">Type 1</button>
-        <button class="mode-btn" data-mode="type2">Type 2</button>
-        <button class="mode-btn" data-mode="type3">Type 3</button>
-        <button class="mode-btn" data-mode="mixed">Mixed Practice</button>
-      </div>
-
-      <div class="mission-card" id="missionCard">
-        <div class="mission-top">
-          <div class="mission-title" id="missionTitle">Mission: Mixed</div>
-          <div class="mission-meta" id="missionMeta">Question 1 of 6</div>
-        </div>
-        <div class="mission-bar"><div class="mission-fill" id="missionFill"></div></div>
-        <div class="mission-bottom">
-          <div class="mission-streak" id="missionStreak">Progress streak: 0 of 6</div>
-          <div class="mission-stars">
-            <div class="mission-star" id="missionStar1">⭐</div>
-            <div class="mission-star" id="missionStar2">⭐</div>
-            <div class="mission-star" id="missionStar3">⭐</div>
-            <div class="mission-star" id="missionStar4">⭐</div>
-            <div class="mission-star" id="missionStar5">⭐</div>
-            <div class="mission-star" id="missionStar6">⭐</div>
-            <div class="mission-star" id="missionStar7">⭐</div>
-            <div class="mission-star" id="missionStar8">⭐</div>
-            <div class="mission-star" id="missionStar9">⭐</div>
-          </div>
-        </div>
-      </div>
-      </div>
-    </section>
-
-
-    <div class="main-grid" id="gameGrid">
-      <section class="card panel-card" id="modelCard">
-        <div class="type-badge" id="typeBadge">Type 1</div>
-        <p class="question-text" id="questionText"></p>
-        <p class="mini-note" id="miniNote">Build the bar model first.</p>
-        <div class="builder-note">Drag the green <strong>unit block</strong> into the correct row. Drag the value and ? labels onto the model. Click a block or label to remove it.</div>
-
-        <div class="model-area" id="modelArea">
-          <div class="model-row">
-            <div class="row-label top" id="rowTopLabel">Top</div>
-            <div class="drop-shell">
-              <div class="annot-wrap" id="topAnnotWrap">
-                <div class="label-target" id="topLabelTarget" aria-label="Top label target">Drop here</div>
-                <div class="brace-line-wrap" id="topBrace"><svg class="brace-svg" viewBox="0 0 100 24" preserveAspectRatio="none" aria-hidden="true"><path class="brace-path" d=""></path></svg></div>
-                <div class="drop-zone" id="dropTop" data-row="top" aria-label="Top row drop zone"></div>
-              </div>
-              <div class="row-helper" id="topHelper">Top row</div>
-            </div>
-          </div>
-          <div class="model-row">
-            <div class="row-label bottom" id="rowBottomLabel">Bottom</div>
-            <div class="drop-shell">
-              <div class="annot-wrap" id="bottomAnnotWrap">
-                <div class="drop-zone" id="dropBottom" data-row="bottom" aria-label="Bottom row drop zone"></div>
-                <div class="brace-line-wrap" id="bottomBrace"><svg class="brace-svg" viewBox="0 0 100 24" preserveAspectRatio="none" aria-hidden="true"><path class="brace-path" d=""></path></svg></div>
-                <div class="label-target" id="bottomLabelTarget" aria-label="Bottom label target">Drop here</div>
-              </div>
-              <div class="row-helper" id="bottomHelper">Bottom row</div>
-            </div>
-          </div>
-
-          <div class="type3-side-anchor" id="type3SideAnchor">
-            <div class="type3-side-brace-wrap" id="type3SideBrace">
-              <svg class="type3-side-brace-svg" viewBox="0 0 24 100" preserveAspectRatio="none" aria-hidden="true">
-                <path class="type3-side-brace-path" d=""></path>
-              </svg>
-            </div>
-            <div class="type3-side-label-target" id="type3SideLabelTarget" aria-label="Type 3 total label target">Drop here</div>
-          </div>
-
-          <div class="type3-partwhole" id="type3PartWholeWrap">
-            <div class="type3-step-caption">Step 2 model</div>
-            <div class="model-row">
-              <div class="row-label top" id="type3PartWholeRowLabel">Part-whole</div>
-              <div>
-                <div class="type3-whole-block" id="type3WholeBlock">
-                  <div class="type3-whole-label" id="type3WholeLabel">?</div>
-                  <div class="type3-whole-brace" id="type3WholeBrace"><svg class="brace-svg" viewBox="0 0 100 24" preserveAspectRatio="none" aria-hidden="true"><path class="brace-path" d=""></path></svg></div>
-                  <div class="type3-partwhole-bar" id="type3PartWholeBar">
-                    <div class="type3-partwhole-seg start" id="type3PartStart"></div>
-                    <div class="type3-partwhole-seg extra" id="type3PartExtra"></div>
-                  </div>
-                </div>
-                <div class="type3-partwhole-labels" id="type3PartWholeLabels">
-                  <div class="type3-partwhole-chip" id="type3PartStartLabel">1 unit</div>
-                  <div class="type3-partwhole-chip extra" id="type3PartExtraLabel">6</div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section class="card panel-card" id="toolCard">
-        <div class="type-badge" style="margin-bottom:6px">Units &amp; Equations</div>
-        <p class="tool-note">Use the middle frame to build with unit blocks and complete the equation steps.</p>
-
-        <div class="tool-shell">
-          <section class="subpanel">
-            <div class="toolbox">
-              <div class="tool-row">
-                <div class="palette-unit" id="paletteUnit" title="Drag me to a row">1 unit</div>
-                <div style="font-size:15px;color:var(--soft)">Drag one block at a time into the model frame.</div>
-              </div>
-              <div class="tool-row" id="labelTools">
-                <div class="palette-tag" id="topValueTag" data-tag="top">6</div>
-                <div class="palette-tag" id="bottomValueTag" data-tag="bottom">?</div>
-                <div id="labelToolHelp" style="font-size:15px;color:var(--soft)">Drag the value and ? labels onto the model.</div>
-              </div>
-              <div class="btn-row">
-                <button class="btn secondary" id="clearModelBtn">Clear Model</button>
-                <button class="btn warn" id="clearAllBtn">Clear Blanks</button>
-              </div>
-            </div>
-          </section>
-
-          <section class="subpanel equation-wrap">
-            <div id="equationHolder"></div>
-            <div class="btn-row">
-              <button class="btn primary" id="checkBtn">Check My Work</button>
-              <button class="btn secondary" id="nextBtn" disabled>Next Question</button>
-            </div>
-            <div class="feedback" id="feedback">Start by building the model.</div>
-            <div class="celebrate" id="celebrate">🎉⭐🎉</div>
-          </section>
-        </div>
-      </section>
-
-      <section class="card work-card panel-card" id="workCard">
-        <div class="work-head">
-          <div>
-            <div class="type-badge" style="margin-bottom:6px">Working Space</div>
-            <div class="work-note">Use the faint Th H T O guide for your vertical multiplication working.</div>
-          </div>
-          <div class="btn-row">
-            <button class="btn secondary" id="clearWorkingBtn" type="button">Clear Working</button>
-          </div>
-        </div>
-
-        <div class="work-area" id="workArea">
-          <div class="place-grid" id="placeGrid" aria-hidden="true">
-            <div class="place-head">
-              <span>&nbsp;</span>
-              <span>H</span>
-              <span>T</span>
-              <span>O</span>
-            </div>
-            <div class="place-vert" style="left:18px;"></div>
-            <div class="place-vert" style="left:74px;"></div>
-            <div class="place-vert" style="left:130px;"></div>
-            <div class="place-vert" style="left:186px;"></div>
-            <div class="place-vert" style="left:242px;"></div>
-            <div class="place-rows" id="placeRows"></div>
-          </div>
-          <canvas id="workingCanvas" aria-label="Working space"></canvas>
-        </div>
-      </section>
-    </div>
-
-
-
-    <section class="card reward-screen" id="rewardScreen">
-      <div class="reward-badge">⭐ Journey Complete</div>
-      <h2 id="rewardTitle">Stage 7 unlocked!</h2>
-      <p id="rewardText">You finished all 6 questions in the full journey.</p>
-      <div class="reward-pet-wrap">
-        <img src="https://raw.githubusercontent.com/limkimsze-maker/P3_More_Word_Problems_Monster_Quest_Pet_7/afc0b3cb434b6df35ea4bb981ac2936dcc76e3ec/7%20pet.png" alt="Stage 7 Pet">
-        <div class="reward-remark">It transforms into a more regal form with armour and a staff.</div>
-      </div>
-      <div class="btn-row" style="justify-content:center">
-        <button class="btn primary" id="rewardPlayAgain">Play Full Journey Again</button>
-        <button class="btn secondary" id="rewardBackMixed">Go to Mixed Practice</button>
-      </div>
-    </section>
-
-    <section class="card end-screen" id="endScreen">
-      <h2>Great job!</h2>
-      <p id="endText"></p>
-      <div class="btn-row" style="justify-content:center">
-        <button class="btn primary" id="restartBtn">Play This Type Again</button>
-        <button class="btn secondary" id="backMixedBtn">Go to Mixed Practice</button>
-      </div>
-    </section>
-
-        <footer>Designed by Lim Kim Sze © 2026</footer>
-      </div>
+<div class="fit-viewport" id="fitViewport"><div class="fit-stage" id="fitStage"><div class="page">
+<section class="hero"><div class="hero-top"><div class="title-wrap"><h1>Word Problems (2 Types Mixed)</h1><p>Build the model, place the labels, then fill in the equation blanks.</p></div><div class="scoreboard"><div class="pill" id="modePill">Mode: Mixed</div><div class="pill" id="progressPill">Question 1 / 6</div><div class="pill" id="scorePill">Score: 0</div></div></div><div class="mode-bar"><button class="mode-btn active" data-mode="mixed">Mixed Practice</button><button class="mode-btn" data-mode="type1">Type 1</button><button class="mode-btn" data-mode="type2">Type 2</button></div></section>
+<div class="mission-card" id="missionCard">
+  <div class="mission-top">
+    <div class="mission-title" id="missionTitle">Game Journey — Type 1</div>
+    <div class="mission-meta" id="missionMeta">Question 1 of 6</div>
+  </div>
+  <div class="mission-bar"><div class="mission-fill" id="missionFill"></div></div>
+  <div class="mission-bottom">
+    <div class="mission-streak" id="missionStreak">Progress streak: 0 of 6</div>
+    <div class="mission-stars">
+      <div class="mission-star" id="missionStar1">⭐</div>
+      <div class="mission-star" id="missionStar2">⭐</div>
+      <div class="mission-star" id="missionStar3">⭐</div>
+      <div class="mission-star" id="missionStar4">⭐</div>
+      <div class="mission-star" id="missionStar5">⭐</div>
+      <div class="mission-star" id="missionStar6">⭐</div>
     </div>
   </div>
+</div>
+<div class="main-grid" id="gameGrid">
+<section class="card panel-card" id="modelCard"><div class="type-badge" id="typeBadge">Type 1</div><p class="question-text" id="questionText"></p><p class="mini-note" id="miniNote"></p><div class="builder-note">Drag the green <strong>unit block</strong> into the model. Drag the labels onto the correct braces. Click a block or label to remove it.</div><div class="model-area"><div class="model-shell"><div class="model-row" id="topRow"><div class="row-label top" id="rowTopLabel">Top</div><div class="bar-wrap"><div class="bar-stage" id="barStage"><div class="brace-wrap" id="topLeftBrace"><svg class="brace-svg" viewBox="0 0 100 26" preserveAspectRatio="none"><path class="brace-path" d=""></path></svg></div><div class="brace-wrap" id="topRightBrace"><svg class="brace-svg" viewBox="0 0 100 26" preserveAspectRatio="none"><path class="brace-path" d=""></path></svg></div><div class="brace-wrap" id="bottomWholeBrace"><svg class="brace-svg" viewBox="0 0 100 26" preserveAspectRatio="none"><path class="brace-path" d=""></path></svg></div><div class="label-target" id="fixedTarget"></div><div class="label-target" id="unknownTarget"></div><div class="label-target" id="totalTarget"></div><div class="bar-zone" id="barZone"><div class="bar-track" id="barTrack"></div></div></div></div></div><div class="model-row bottom-tight" id="bottomRow"><div class="row-label bottom" id="rowBottomLabel">Bottom</div><div></div></div></div></div></section>
+<section class="card panel-card" id="toolCard"><div class="type-badge" style="margin-bottom:6px">Units &amp; Equations</div><p class="tool-note">Use the middle frame to build the model and complete the equation steps.</p><div class="tool-shell"><section class="subpanel"><div class="toolbox"><div class="tool-row"><div class="palette-unit" id="paletteUnit">1 unit</div><div style="font-size:15px;color:var(--soft)">Drag one block at a time into the model frame.</div></div><div class="tool-row" id="labelTools"></div><div id="labelToolHelp" style="font-size:15px;color:var(--soft)"></div><div class="btn-row"><button class="btn secondary" id="clearModelBtn">Clear Model</button><button class="btn warn" id="clearBlanksBtn">Clear Blanks</button></div></div></section><section class="subpanel equation-wrap"><div id="equationHolder"></div><div class="btn-row"><button class="btn primary" id="checkBtn">Check My Work</button><button class="btn secondary" id="nextBtn" disabled>Next Question</button></div><div class="feedback" id="feedback">Start by building the model.</div><div class="celebrate" id="celebrate">🎉⭐🎉</div></section></div></section>
+<section class="card work-card panel-card" id="workCard"><div class="work-head"><div><div class="type-badge" style="margin-bottom:6px">Working Space</div><div class="work-note">Use the faint H T O guide for your vertical working.</div></div><div class="btn-row"><button class="btn secondary" id="clearWorkingBtn" type="button">Clear Working</button></div></div><div class="work-area" id="workArea"><div class="place-grid" aria-hidden="true"><div class="place-head"><span>H</span><span>T</span><span>O</span></div><div class="place-vert" style="left:74px;"></div><div class="place-vert" style="left:130px;"></div><div class="place-vert" style="left:186px;"></div><div class="place-vert" style="left:242px;"></div><div class="place-rows" id="placeRows"></div></div><canvas id="workingCanvas" aria-label="Working space"></canvas></div></section>
+</div>
+<section class="card reward-screen" id="rewardScreen">
+  <div class="reward-box">
+    <div class="reward-badge">⭐ Adventure Complete</div>
+    <div class="reward-title">6-Question Adventure Cleared!</div>
+    <div class="reward-sub" id="rewardText">You completed all 6 questions.</div>
+    <div class="reward-stars-big">⭐⭐⭐</div>
+    <div class="btn-row" style="justify-content:center">
+      <button class="btn primary" id="rewardPlayAgain">Play Full Journey Again</button>
+      <button class="btn secondary" id="rewardBackMixed">Go to Mixed Practice</button>
+    </div>
+  </div>
+</section>
+<section class="card end-screen" id="endScreen"><h2>Great job!</h2><p id="endText"></p><div class="btn-row" style="justify-content:center"><button class="btn primary" id="restartBtn">Play This Mode Again</button><button class="btn secondary" id="backMixedBtn">Go to Mixed Practice</button></div></section>
+<footer>Designed by Lim Kim Sze © 2026</footer>
+</div></div></div>
+<script>
+const QUESTION_BANK={type1:[{id:'t1-1',type:1,typeLabel:'Type 1 — Subtract first, then divide equally',prompt:'Mr Goh had 348 ice-cream sticks. He used 40 ice-cream sticks to build a little wooden hut. He put the rest equally into 4 cups. How many ice-cream sticks did he put into each cup?',topLabel:'Used',bottomLabel:'Cups',fixedAmount:40,total:348,groupUnits:4,remainingTotal:308,answer:77,itemWord:'ice-cream sticks',finalPrefix:'He put',finalSuffix:'ice-cream sticks into each cup.',miniNote:'Subtract the used amount first. Then divide the rest equally.'},{id:'t1-2',type:1,typeLabel:'Type 1 — Subtract first, then divide equally',prompt:'Aisha had 286 beads. She used 46 beads to make a bracelet. She put the rest equally into 5 jars. How many beads did she put into each jar?',topLabel:'Used',bottomLabel:'Jars',fixedAmount:46,total:286,groupUnits:5,remainingTotal:240,answer:48,itemWord:'beads',finalPrefix:'She put',finalSuffix:'beads into each jar.',miniNote:'Find the rest first. Then divide the rest equally.'},{id:'t1-3',type:1,typeLabel:'Type 1 — Subtract first, then divide equally',prompt:'Mr Lee had 432 stickers. He used 72 stickers for a display board. He put the rest equally into 6 files. How many stickers did he put into each file?',topLabel:'Used',bottomLabel:'Files',fixedAmount:72,total:432,groupUnits:6,remainingTotal:360,answer:60,itemWord:'stickers',finalPrefix:'He put',finalSuffix:'stickers into each file.',miniNote:'Take away the used amount. Then divide the remaining stickers equally.'},{id:'t1-4',type:1,typeLabel:'Type 1 — Subtract first, then divide equally',prompt:'Tina had 375 sweets. She ate 15 sweets. She put the rest equally into 4 packets. How many sweets did she put into each packet?',topLabel:'Ate',bottomLabel:'Packets',fixedAmount:15,total:375,groupUnits:4,remainingTotal:360,answer:90,itemWord:'sweets',finalPrefix:'She put',finalSuffix:'sweets into each packet.',miniNote:'Subtract first, then divide equally.'},{id:'t1-5',type:1,typeLabel:'Type 1 — Subtract first, then divide equally',prompt:'Ben had 560 buttons. He used 80 buttons for an art project. He put the rest equally into 8 boxes. How many buttons did he put into each box?',topLabel:'Used',bottomLabel:'Boxes',fixedAmount:80,total:560,groupUnits:8,remainingTotal:480,answer:60,itemWord:'buttons',finalPrefix:'He put',finalSuffix:'buttons into each box.',miniNote:'First find the rest. Then divide by the number of boxes.'}],type2:[{id:'t2-1',type:2,typeLabel:'Type 2 — Find 1 unit, then find the asked units',prompt:'Adam had 495 marbles. He packed all the marbles into 5 bags. He gave away two of the packed bags. How many marbles did he give away?',topLabel:'Given away',bottomLabel:'Bags',total:495,totalUnits:5,askedUnits:2,oneUnit:99,answer:198,itemWord:'marbles',finalPrefix:'He gave away',finalSuffix:'marbles.',miniNote:'Find 1 bag first. Then find 2 bags.'},{id:'t2-2',type:2,typeLabel:'Type 2 — Find 1 unit, then find the asked units',prompt:'Nora had 384 pens. She packed all the pens into 6 boxes. She donated 3 of the packed boxes. How many pens did she donate?',topLabel:'Donated',bottomLabel:'Boxes',total:384,totalUnits:6,askedUnits:3,oneUnit:64,answer:192,itemWord:'pens',finalPrefix:'She donated',finalSuffix:'pens.',miniNote:'Divide to find 1 box first. Then multiply for 3 boxes.'},{id:'t2-3',type:2,typeLabel:'Type 2 — Find 1 unit, then find the asked units',prompt:'Ali had 672 stickers. He packed all the stickers into 8 albums. He gave 5 of the packed albums to his cousins. How many stickers did he give away?',topLabel:'Given away',bottomLabel:'Albums',total:672,totalUnits:8,askedUnits:5,oneUnit:84,answer:420,itemWord:'stickers',finalPrefix:'He gave away',finalSuffix:'stickers.',miniNote:'Find 1 album first. Then find 5 albums.'},{id:'t2-4',type:2,typeLabel:'Type 2 — Find 1 unit, then find the asked units',prompt:'Mei had 360 sweets. She packed all the sweets into 9 bags. She gave 4 of the packed bags to her friends. How many sweets did she give away?',topLabel:'Given away',bottomLabel:'Bags',total:360,totalUnits:9,askedUnits:4,oneUnit:40,answer:160,itemWord:'sweets',finalPrefix:'She gave away',finalSuffix:'sweets.',miniNote:'First find 1 bag. Then find 4 bags.'},{id:'t2-5',type:2,typeLabel:'Type 2 — Find 1 unit, then find the asked units',prompt:'Ravi had 525 marbles. He packed all the marbles into 7 tubes. He gave away 2 of the packed tubes. How many marbles did he give away?',topLabel:'Given away',bottomLabel:'Tubes',total:525,totalUnits:7,askedUnits:2,oneUnit:75,answer:150,itemWord:'marbles',finalPrefix:'He gave away',finalSuffix:'marbles.',miniNote:'Divide to get 1 tube first. Then multiply for 2 tubes.'}]};
 
-  <script>
-    const QUESTION_BANK = {
-      type1: [
-        {
-          id: 't1-1',
-          type: 1,
-          typeLabel: 'Type 1 — 1 unit is given, find total',
-          prompt: 'Claire had 14 dolls. Nancy had 3 times as many dolls as Claire. How many dolls did they have in total?',
-          rowTopLabel: 'Claire',
-          rowBottomLabel: 'Nancy',
-          expectedTopUnits: 1,
-          expectedBottomUnits: 3,
-          knownUnitValue: 14,
-          multiplier: 3,
-          totalUnits: 4,
-          finalAnswer: 56,
-          itemWord: 'dolls',
-          finalLine: 'They had',
-          finalLineSuffix: 'dolls in total.',
-          miniNote: '1 unit is given. Count all the units first, then multiply.'
-        },
-        {
-          id: 't1-2',
-          type: 1,
-          typeLabel: 'Type 1 — 1 unit is given, find total',
-          prompt: 'Amir had 9 marbles. Ben had 4 times as many marbles as Amir. How many marbles did they have in total?',
-          rowTopLabel: 'Amir',
-          rowBottomLabel: 'Ben',
-          expectedTopUnits: 1,
-          expectedBottomUnits: 4,
-          knownUnitValue: 9,
-          multiplier: 4,
-          totalUnits: 5,
-          finalAnswer: 45,
-          itemWord: 'marbles',
-          finalLine: 'They had',
-          finalLineSuffix: 'marbles in total.',
-          miniNote: 'The smaller amount is 1 unit. Count all the units for the total.'
-        },
-        {
-          id: 't1-3',
-          type: 1,
-          typeLabel: 'Type 1 — 1 unit is given, find total',
-          prompt: 'Hana had 6 ribbons. Mira had 5 times as many ribbons as Hana. How many ribbons did they have in total?',
-          rowTopLabel: 'Hana',
-          rowBottomLabel: 'Mira',
-          expectedTopUnits: 1,
-          expectedBottomUnits: 5,
-          knownUnitValue: 6,
-          multiplier: 5,
-          totalUnits: 6,
-          finalAnswer: 36,
-          itemWord: 'ribbons',
-          finalLine: 'They had',
-          finalLineSuffix: 'ribbons in total.',
-          miniNote: 'Use the 1-unit bar to build the bigger bar, then find the total.'
-        },
-        {
-          id: 't1-4',
-          type: 1,
-          typeLabel: 'Type 1 — 1 unit is given, find total',
-          prompt: 'Ethan had 8 stickers. Joel had 2 times as many stickers as Ethan. How many stickers did they have in total?',
-          rowTopLabel: 'Ethan',
-          rowBottomLabel: 'Joel',
-          expectedTopUnits: 1,
-          expectedBottomUnits: 2,
-          knownUnitValue: 8,
-          multiplier: 2,
-          totalUnits: 3,
-          finalAnswer: 24,
-          itemWord: 'stickers',
-          finalLine: 'They had',
-          finalLineSuffix: 'stickers in total.',
-          miniNote: 'Count both people’s units together before multiplying.'
-        },
-        {
-          id: 't1-5',
-          type: 1,
-          typeLabel: 'Type 1 — 1 unit is given, find total',
-          prompt: 'Priya had 7 shells. Zara had 3 times as many shells as Priya. How many shells did they have in total?',
-          rowTopLabel: 'Priya',
-          rowBottomLabel: 'Zara',
-          expectedTopUnits: 1,
-          expectedBottomUnits: 3,
-          knownUnitValue: 7,
-          multiplier: 3,
-          totalUnits: 4,
-          finalAnswer: 28,
-          itemWord: 'shells',
-          finalLine: 'They had',
-          finalLineSuffix: 'shells in total.',
-          miniNote: 'Find the number of units altogether, then multiply by the value of 1 unit.'
-        }
-      ],
-      type2: [
-        {
-          id: 't2-1',
-          type: 2,
-          typeLabel: 'Type 2 — Bigger amount is given, find total',
-          prompt: 'Johan has 40 sweets. Lokman has half as many sweets as Johan. How many sweets do they have altogether?',
-          rowTopLabel: 'Johan',
-          rowBottomLabel: 'Lokman',
-          expectedTopUnits: 2,
-          expectedBottomUnits: 1,
-          knownTotal: 40,
-          knownUnits: 2,
-          totalUnits: 3,
-          unitValue: 20,
-          finalAnswer: 60,
-          itemWord: 'sweets',
-          finalLine: 'They have',
-          finalLineSuffix: 'sweets altogether.',
-          miniNote: 'The known amount covers 2 units. Find 1 unit first, then all 3 units.'
-        },
-        {
-          id: 't2-2',
-          type: 2,
-          typeLabel: 'Type 2 — Bigger amount is given, find total',
-          prompt: 'Emma has 45 beads. Sara has one-third as many beads as Emma. How many beads do they have altogether?',
-          rowTopLabel: 'Emma',
-          rowBottomLabel: 'Sara',
-          expectedTopUnits: 3,
-          expectedBottomUnits: 1,
-          knownTotal: 45,
-          knownUnits: 3,
-          totalUnits: 4,
-          unitValue: 15,
-          finalAnswer: 60,
-          itemWord: 'beads',
-          finalLine: 'They have',
-          finalLineSuffix: 'beads altogether.',
-          miniNote: 'The top bar is the known bigger amount. Divide it into equal units first.'
-        },
-        {
-          id: 't2-3',
-          type: 2,
-          typeLabel: 'Type 2 — Bigger amount is given, find total',
-          prompt: 'Ryan has 32 marbles. Tim has half as many marbles as Ryan. How many marbles do they have altogether?',
-          rowTopLabel: 'Ryan',
-          rowBottomLabel: 'Tim',
-          expectedTopUnits: 2,
-          expectedBottomUnits: 1,
-          knownTotal: 32,
-          knownUnits: 2,
-          totalUnits: 3,
-          unitValue: 16,
-          finalAnswer: 48,
-          itemWord: 'marbles',
-          finalLine: 'They have',
-          finalLineSuffix: 'marbles altogether.',
-          miniNote: 'Find the value of 1 unit, then multiply to get the total units.'
-        },
-        {
-          id: 't2-4',
-          type: 2,
-          typeLabel: 'Type 2 — Bigger amount is given, find total',
-          prompt: 'Grace has 24 buttons. Lina has one-third as many buttons as Grace. How many buttons do they have altogether?',
-          rowTopLabel: 'Grace',
-          rowBottomLabel: 'Lina',
-          expectedTopUnits: 3,
-          expectedBottomUnits: 1,
-          knownTotal: 24,
-          knownUnits: 3,
-          totalUnits: 4,
-          unitValue: 8,
-          finalAnswer: 32,
-          itemWord: 'buttons',
-          finalLine: 'They have',
-          finalLineSuffix: 'buttons altogether.',
-          miniNote: 'The known bar shows several equal units. Divide before you add both amounts.'
-        },
-        {
-          id: 't2-5',
-          type: 2,
-          typeLabel: 'Type 2 — Bigger amount is given, find total',
-          prompt: 'Aisyah has 36 stamps. Mei has one-fourth as many stamps as Aisyah. How many stamps do they have altogether?',
-          rowTopLabel: 'Aisyah',
-          rowBottomLabel: 'Mei',
-          expectedTopUnits: 4,
-          expectedBottomUnits: 1,
-          knownTotal: 36,
-          knownUnits: 4,
-          totalUnits: 5,
-          unitValue: 9,
-          finalAnswer: 45,
-          itemWord: 'stamps',
-          finalLine: 'They have',
-          finalLineSuffix: 'stamps altogether.',
-          miniNote: 'Break the known amount into equal parts, then count all the units.'
-        }
-      ],
-      type3: [
-        {
-          id: 't3-1',
-          type: 3,
-          typeLabel: 'Type 3 — Find 1 unit first, then add on',
-          prompt: 'Vincent and Ricky together collected 60 stamps. Vincent collected 4 times as many stamps as Ricky. Ricky found another 12 stamps. How many stamps did Ricky have in the end?',
-          rowTopLabel: 'Ricky',
-          rowBottomLabel: 'Vincent',
-          expectedTopUnits: 1,
-          expectedBottomUnits: 4,
-          totalTogether: 60,
-          sumUnits: 5,
-          unitValue: 12,
-          extraAmount: 12,
-          finalAnswer: 24,
-          itemWord: 'stamps',
-          finalName: 'Ricky',
-          finalLine: 'Ricky had',
-          finalLineSuffix: 'stamps in the end.',
-          miniNote: 'First use the total to find Ricky’s starting amount. Then add the extra stamps.'
-        },
-        {
-          id: 't3-2',
-          type: 3,
-          typeLabel: 'Type 3 — Find 1 unit first, then add on',
-          prompt: 'Ava and Zoe together had 35 stickers. Ava had 4 times as many stickers as Zoe. Zoe got another 9 stickers. How many stickers did Zoe have in the end?',
-          rowTopLabel: 'Zoe',
-          rowBottomLabel: 'Ava',
-          expectedTopUnits: 1,
-          expectedBottomUnits: 4,
-          totalTogether: 35,
-          sumUnits: 5,
-          unitValue: 7,
-          extraAmount: 9,
-          finalAnswer: 16,
-          itemWord: 'stickers',
-          finalName: 'Zoe',
-          finalLine: 'Zoe had',
-          finalLineSuffix: 'stickers in the end.',
-          miniNote: 'Find Zoe’s first amount from the total, then add the extra stickers.'
-        },
-        {
-          id: 't3-3',
-          type: 3,
-          typeLabel: 'Type 3 — Find 1 unit first, then add on',
-          prompt: 'Daniel and Ben together collected 48 shells. Daniel collected 5 times as many shells as Ben. Ben found another 6 shells. How many shells did Ben have in the end?',
-          rowTopLabel: 'Ben',
-          rowBottomLabel: 'Daniel',
-          expectedTopUnits: 1,
-          expectedBottomUnits: 5,
-          totalTogether: 48,
-          sumUnits: 6,
-          unitValue: 8,
-          extraAmount: 6,
-          finalAnswer: 14,
-          itemWord: 'shells',
-          finalName: 'Ben',
-          finalLine: 'Ben had',
-          finalLineSuffix: 'shells in the end.',
-          miniNote: 'Use the total and the number of units to find Ben’s first amount.'
-        },
-        {
-          id: 't3-4',
-          type: 3,
-          typeLabel: 'Type 3 — Find 1 unit first, then add on',
-          prompt: 'Chloe and Emma together packed 54 ribbons. Chloe packed 2 times as many ribbons as Emma. Emma packed another 7 ribbons. How many ribbons did Emma have in the end?',
-          rowTopLabel: 'Emma',
-          rowBottomLabel: 'Chloe',
-          expectedTopUnits: 1,
-          expectedBottomUnits: 2,
-          totalTogether: 54,
-          sumUnits: 3,
-          unitValue: 18,
-          extraAmount: 7,
-          finalAnswer: 25,
-          itemWord: 'ribbons',
-          finalName: 'Emma',
-          finalLine: 'Emma had',
-          finalLineSuffix: 'ribbons in the end.',
-          miniNote: 'First find Emma’s starting amount. Then add the extra ribbons.'
-        },
-        {
-          id: 't3-5',
-          type: 3,
-          typeLabel: 'Type 3 — Find 1 unit first, then add on',
-          prompt: 'Mia and Noah together saved 72 tokens. Noah saved 3 times as many tokens as Mia. Mia won another 10 tokens. How many tokens did Mia have in the end?',
-          rowTopLabel: 'Mia',
-          rowBottomLabel: 'Noah',
-          expectedTopUnits: 1,
-          expectedBottomUnits: 3,
-          totalTogether: 72,
-          sumUnits: 4,
-          unitValue: 18,
-          extraAmount: 10,
-          finalAnswer: 28,
-          itemWord: 'tokens',
-          finalName: 'Mia',
-          finalLine: 'Mia had',
-          finalLineSuffix: 'tokens in the end.',
-          miniNote: 'Use the total units to find 1 unit first, then add the extra amount.'
-        }
-      ]
-    };
+const ALL_QUESTIONS=[...QUESTION_BANK.type1,...QUESTION_BANK.type2];
+const modeNames={mixed:'Mixed',type1:'Type 1',type2:'Type 2'};
+const MODE_TARGETS={type1:2,type2:2,mixed:2};
+const JOURNEY_TARGET=6;
+const JOURNEY_ORDER=['type1','type2','mixed'];
 
-    const ALL_QUESTIONS = [...QUESTION_BANK.type1, ...QUESTION_BANK.type2, ...QUESTION_BANK.type3];
+let currentMode='type1',queue=[],currentIndex=0,score=0,solved=false,modelUnits=0,dragState=null,labelsPlaced={fixed:false,unknown:false,total:false};
+let isJourneyMode=true;
+let journeyQueues=null;
+let modeProgress={type1:0,type2:0,mixed:0};
 
-    const MODE_TARGETS = { type1: 2, type2: 2, type3: 2, mixed: 3 };
-    const JOURNEY_TARGET = 6;
-    let currentMode = 'type1';
-    let queue = [];
-    let currentIndex = 0;
-    let score = 0;
-    let journeyProgress = 0;
-    let modeProgress = { type1: 0, type2: 0, type3: 0, mixed: 0 };
-    let modeQueues = { type1: [], type2: [], type3: [], mixed: [] };
-    let solved = false;
-    let modelState = { top: 0, bottom: 0 };
-    let dragState = null;
-    let labelState = { top:false, bottom:false };
+const modeButtons=Array.from(document.querySelectorAll('.mode-btn'));
+const typeBadge=document.getElementById('typeBadge');
+const questionText=document.getElementById('questionText');
+const miniNote=document.getElementById('miniNote');
+const rowTopLabel=document.getElementById('rowTopLabel');
+const rowBottomLabel=document.getElementById('rowBottomLabel');
+const topRow=document.getElementById('topRow');
+const bottomRow=document.getElementById('bottomRow');
+const barZone=document.getElementById('barZone');
+const barTrack=document.getElementById('barTrack');
+const fixedTarget=document.getElementById('fixedTarget');
+const unknownTarget=document.getElementById('unknownTarget');
+const totalTarget=document.getElementById('totalTarget');
+const topLeftBrace=document.getElementById('topLeftBrace');
+const topRightBrace=document.getElementById('topRightBrace');
+const bottomWholeBrace=document.getElementById('bottomWholeBrace');
+const labelTools=document.getElementById('labelTools');
+const labelToolHelp=document.getElementById('labelToolHelp');
+const equationHolder=document.getElementById('equationHolder');
+const feedback=document.getElementById('feedback');
+const celebrate=document.getElementById('celebrate');
+const nextBtn=document.getElementById('nextBtn');
+const progressPill=document.getElementById('progressPill');
+const scorePill=document.getElementById('scorePill');
+const modePill=document.getElementById('modePill');
+const missionTitle=document.getElementById('missionTitle');
+const missionMeta=document.getElementById('missionMeta');
+const missionFill=document.getElementById('missionFill');
+const missionStreakEl=document.getElementById('missionStreak');
+const missionStars=Array.from({length:JOURNEY_TARGET}, (_,i)=>document.getElementById(`missionStar${i+1}`));
+const rewardScreen=document.getElementById('rewardScreen');
+const rewardText=document.getElementById('rewardText');
+const endScreen=document.getElementById('endScreen');
+const endText=document.getElementById('endText');
+const gameGrid=document.getElementById('gameGrid');
 
-    const modeNames = {
-      mixed: 'Mixed',
-      type1: 'Type 1',
-      type2: 'Type 2',
-      type3: 'Type 3'
-    };
-
-    const modeButtons = Array.from(document.querySelectorAll('.mode-btn'));
-    const questionText = document.getElementById('questionText');
-    const typeBadge = document.getElementById('typeBadge');
-    const miniNote = document.getElementById('miniNote');
-    const rowTopLabel = document.getElementById('rowTopLabel');
-    const rowBottomLabel = document.getElementById('rowBottomLabel');
-    const topHelper = document.getElementById('topHelper');
-    const bottomHelper = document.getElementById('bottomHelper');
-    const dropTop = document.getElementById('dropTop');
-    const dropBottom = document.getElementById('dropBottom');
-    const topAnnotWrap = document.getElementById('topAnnotWrap');
-    const bottomAnnotWrap = document.getElementById('bottomAnnotWrap');
-    const topLabelTarget = document.getElementById('topLabelTarget');
-    const bottomLabelTarget = document.getElementById('bottomLabelTarget');
-    const topBrace = document.getElementById('topBrace');
-    const bottomBrace = document.getElementById('bottomBrace');
-    const type3SideAnchor = document.getElementById('type3SideAnchor');
-    const type3SideBrace = document.getElementById('type3SideBrace');
-    const type3SideLabelTarget = document.getElementById('type3SideLabelTarget');
-    const type3PartWholeWrap = document.getElementById('type3PartWholeWrap');
-    const type3WholeBrace = document.getElementById('type3WholeBrace');
-    const type3PartWholeBar = document.getElementById('type3PartWholeBar');
-    const type3PartWholeLabels = document.getElementById('type3PartWholeLabels');
-    const type3PartStartLabel = document.getElementById('type3PartStartLabel');
-    const type3PartExtraLabel = document.getElementById('type3PartExtraLabel');
-    const type3PartWholeRowLabel = document.getElementById('type3PartWholeRowLabel');
-    const topValueTag = document.getElementById('topValueTag');
-    const bottomValueTag = document.getElementById('bottomValueTag');
-    const labelToolHelp = document.getElementById('labelToolHelp');
-    const equationHolder = document.getElementById('equationHolder');
-    const feedback = document.getElementById('feedback');
-    const celebrate = document.getElementById('celebrate');
-    const progressPill = document.getElementById('progressPill');
-    const scorePill = document.getElementById('scorePill');
-    const modePill = document.getElementById('modePill');
-    const missionTitle = document.getElementById('missionTitle');
-    const missionMeta = document.getElementById('missionMeta');
-    const missionFill = document.getElementById('missionFill');
-    const missionStreakEl = document.getElementById('missionStreak');
-    const missionStars = Array.from({length:JOURNEY_TARGET}, (_,i) => document.getElementById(`missionStar${i+1}`));
-    const nextBtn = document.getElementById('nextBtn');
-    const rewardScreen = document.getElementById('rewardScreen');
-    const rewardTitle = document.getElementById('rewardTitle');
-    const rewardText = document.getElementById('rewardText');
-    const endScreen = document.getElementById('endScreen');
-    const gameGrid = document.getElementById('gameGrid');
-    const endText = document.getElementById('endText');
-
-    const placeRows = document.getElementById('placeRows');
-    const workArea = document.getElementById('workArea');
-    const workingCanvas = document.getElementById('workingCanvas');
-    const clearWorkingBtn = document.getElementById('clearWorkingBtn');
-
-    let workingCtx = null;
-    let workingDrawing = false;
-    let workingLastPoint = null;
-    let workingCurrentStroke = null;
-    let workingStrokes = [];
-    let lastWorkAreaSize = { width: 0, height: 0 };
-
-    function buildPlaceRows(count = 9){
-      if(!placeRows) return;
-      placeRows.innerHTML = Array.from({length:count}, () => `
-        <div class="place-row">
-          <div class="place-line"></div>
-        </div>
-      `).join('');
+function shuffle(arr){const copy=[...arr];for(let i=copy.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[copy[i],copy[j]]=[copy[j],copy[i]]}return copy}
+function getModeQuestions(mode){
+  if(mode==='mixed'){
+    return shuffle([
+      shuffle(QUESTION_BANK.type1)[0],
+      shuffle(QUESTION_BANK.type2)[0]
+    ]);
+  }
+  return shuffle(QUESTION_BANK[mode]||[]).slice(0, MODE_TARGETS[mode]||0);
+}
+function buildJourneyQueues(){
+  const t1=shuffle(QUESTION_BANK.type1);
+  const t2=shuffle(QUESTION_BANK.type2);
+  return {
+    type1:t1.slice(0,2),
+    type2:t2.slice(0,2),
+    mixed:shuffle([t1[2], t2[2]].filter(Boolean))
+  };
+}
+function currentQuestion(){return queue[currentIndex]}
+function buildPlaceRows(count=9){const placeRows=document.getElementById('placeRows');if(!placeRows)return;placeRows.innerHTML=Array.from({length:count},()=>'<div class="place-row"><div class="place-line"></div></div>').join('')}
+function getLabelConfig(q){return q.type===1?[{key:'fixed',text:String(q.fixedAmount)},{key:'total',text:String(q.total)},{key:'unknown',text:'?'}]:[{key:'total',text:String(q.total)},{key:'unknown',text:'?'}]}
+function setLabelToolbox(q){labelTools.innerHTML='';getLabelConfig(q).forEach(item=>{const tag=document.createElement('div');tag.className='palette-tag';tag.textContent=item.text;tag.dataset.key=item.key;labelTools.appendChild(tag);tag.addEventListener('pointerdown',e=>{if(solved)return;e.preventDefault();dragState={kind:'tag',key:item.key,text:item.text,ghost:createTagGhost(item.text,e.clientX,e.clientY)}})});labelToolHelp.textContent=q.type===1?'Drag the used amount, the total amount, and the ? 1-unit label onto the correct braces.':'Drag the total amount and the ? label onto the correct braces.'}
+function getJourneyQuestionNumber(){const idx=JOURNEY_ORDER.indexOf(currentMode);return idx<0?currentIndex+1:(idx*2)+currentIndex+1}
+function updateModeButtons(){
+  modeButtons.forEach(btn=>{
+    const mode=btn.dataset.mode;
+    const baseText=mode==='mixed'?'Mixed Practice':modeNames[mode];
+    btn.classList.toggle('active', mode===currentMode);
+    if(isJourneyMode && JOURNEY_ORDER.includes(mode)){
+      const done=(modeProgress[mode]||0) >= ((journeyQueues?.[mode]?.length) || MODE_TARGETS[mode] || 0);
+      btn.textContent=done?`${baseText} ✓`:baseText;
+    }else{
+      btn.textContent=baseText;
     }
-
-    function setupWorkingCanvas(forceRedraw = false){
-      if(!workingCanvas || !workArea) return;
-
-      const width = workArea.clientWidth;
-      const height = workArea.clientHeight;
-      if(!width || !height) return;
-
-      const sizeChanged = width !== lastWorkAreaSize.width || height !== lastWorkAreaSize.height;
-      if(!forceRedraw && !sizeChanged && workingCtx) return;
-
-      const ratio = window.devicePixelRatio || 1;
-      workingCanvas.width = Math.round(width * ratio);
-      workingCanvas.height = Math.round(height * ratio);
-      workingCanvas.style.width = `${width}px`;
-      workingCanvas.style.height = `${height}px`;
-
-      workingCtx = workingCanvas.getContext('2d');
-      workingCtx.setTransform(ratio, 0, 0, ratio, 0, 0);
-      workingCtx.lineCap = 'round';
-      workingCtx.lineJoin = 'round';
-      workingCtx.lineWidth = 3.5;
-      workingCtx.strokeStyle = '#4d6270';
-      workingCtx.imageSmoothingEnabled = false;
-
-      lastWorkAreaSize = { width, height };
-      redrawWorking();
-    }
-
-    function getWorkingPoint(e){
-      const rect = workingCanvas.getBoundingClientRect();
-      const cssW = parseFloat(workingCanvas.style.width) || workingCanvas.clientWidth || rect.width || 1;
-      const cssH = parseFloat(workingCanvas.style.height) || workingCanvas.clientHeight || rect.height || 1;
-
-      const rawX = Math.max(0, Math.min(rect.width, e.clientX - rect.left));
-      const rawY = Math.max(0, Math.min(rect.height, e.clientY - rect.top));
-
-      const x = rect.width ? (rawX * cssW / rect.width) : rawX;
-      const y = rect.height ? (rawY * cssH / rect.height) : rawY;
-
-      return {
-        x,
-        y,
-        nx: cssW ? x / cssW : 0,
-        ny: cssH ? y / cssH : 0
-      };
-    }
-
-    function redrawWorking(){
-      if(!workingCtx) return;
-      const w = parseFloat(workingCanvas.style.width) || 0;
-      const h = parseFloat(workingCanvas.style.height) || 0;
-      workingCtx.clearRect(0, 0, w, h);
-
-      for(const stroke of workingStrokes){
-        if(!stroke.points || !stroke.points.length) continue;
-        workingCtx.beginPath();
-        const first = stroke.points[0];
-        workingCtx.moveTo(first.x * w, first.y * h);
-        for(let i = 1; i < stroke.points.length; i++){
-          const pt = stroke.points[i];
-          workingCtx.lineTo(pt.x * w, pt.y * h);
-        }
-        if(stroke.points.length === 1){
-          workingCtx.lineTo(first.x * w + 0.01, first.y * h + 0.01);
-        }
-        workingCtx.stroke();
-      }
-    }
-
-    function startWorkingDraw(e){
-      setupWorkingCanvas();
-      if(!workingCtx) return;
-      e.preventDefault();
-      workingDrawing = true;
-      workingLastPoint = getWorkingPoint(e);
-      workingCurrentStroke = { points:[{ x: workingLastPoint.nx, y: workingLastPoint.ny }] };
-      workingStrokes.push(workingCurrentStroke);
-
-      workingCtx.beginPath();
-      workingCtx.moveTo(workingLastPoint.x, workingLastPoint.y);
-      workingCtx.lineTo(workingLastPoint.x + 0.01, workingLastPoint.y + 0.01);
-      workingCtx.stroke();
-    }
-
-    function moveWorkingDraw(e){
-      if(!workingDrawing || !workingCtx || !workingCurrentStroke) return;
-      e.preventDefault();
-      const pt = getWorkingPoint(e);
-      workingCtx.beginPath();
-      workingCtx.moveTo(workingLastPoint.x, workingLastPoint.y);
-      workingCtx.lineTo(pt.x, pt.y);
-      workingCtx.stroke();
-      workingCurrentStroke.points.push({ x: pt.nx, y: pt.ny });
-      workingLastPoint = pt;
-    }
-
-    function stopWorkingDraw(e){
-      if(e && workingCanvas?.hasPointerCapture?.(e.pointerId)){
-        workingCanvas.releasePointerCapture(e.pointerId);
-      }
-      workingDrawing = false;
-      workingLastPoint = null;
-      workingCurrentStroke = null;
-    }
-
-    function clearWorking(){
-      workingStrokes = [];
-      if(!workingCtx) return;
-      const w = parseFloat(workingCanvas.style.width) || 0;
-      const h = parseFloat(workingCanvas.style.height) || 0;
-      workingCtx.clearRect(0, 0, w, h);
-    }
-
-    function shuffle(arr){
-      const copy = [...arr];
-      for(let i=copy.length-1;i>0;i--){
-        const j = Math.floor(Math.random() * (i + 1));
-        [copy[i], copy[j]] = [copy[j], copy[i]];
-      }
-      return copy;
-    }
-
-    function getModeQuestions(mode){
-      if(mode === 'mixed'){
-        return shuffle([
-          shuffle(QUESTION_BANK.type1)[0],
-          shuffle(QUESTION_BANK.type2)[0],
-          shuffle(QUESTION_BANK.type3)[0]
-        ]);
-      }
-      return shuffle(QUESTION_BANK[mode] || []).slice(0, MODE_TARGETS[mode] || 0);
-    }
-
-    function buildJourneyQueues(){
-      const type1Pool = shuffle(QUESTION_BANK.type1);
-      const type2Pool = shuffle(QUESTION_BANK.type2);
-      const type3Pool = shuffle(QUESTION_BANK.type3);
-
-      return {
-        type1: type1Pool.slice(0, 2),
-        type2: type2Pool.slice(0, 2),
-        type3: type3Pool.slice(0, 2),
-        mixed: shuffle([type1Pool[2], type2Pool[2], type3Pool[2]].filter(Boolean))
-      };
-    }
-
-    const JOURNEY_ORDER = ['type1', 'type2', 'type3'];
-    let isJourneyMode = true;
-    let journeyQueues = null;
-
-    function usesDragLabels(q){
-      return !!q;
-    }
-
-    function getLabelConfig(q){
-      if(!q) return null;
-      if(q.type === 1){
-        return {
-          topText:String(q.knownUnitValue),
-          bottomText:'?',
-          help:'Drag the known value to the 1-unit bar. Drag ? to the side bracket for the total.'
-        };
-      }
-      if(q.type === 2){
-        return {
-          topText:String(q.knownTotal),
-          bottomText:'?',
-          help:'Drag the known total to the bigger bar. Drag ? to the side bracket for the total.'
-        };
-      }
-      return {
-        topText:'?',
-        bottomText:String(q.totalTogether),
-        help:'Drag ? to the smaller bar. Drag the total to the side bracket for the whole total.'
-      };
-    }
-
-    function createTagGhost(label, x, y){
-      const ghost = document.createElement('div');
-      ghost.className = 'ghost-tag';
-      ghost.textContent = label;
-      ghost.style.left = `${x}px`;
-      ghost.style.top = `${y}px`;
-      document.body.appendChild(ghost);
-      return ghost;
-    }
-
-    function updateBraceSvg(braceEl, isTop){
-      if(!braceEl) return;
-      const svg = braceEl.querySelector('.brace-svg');
-      const path = braceEl.querySelector('.brace-path');
-      if(!svg || !path) return;
-      const w = Math.max(Math.round(braceEl.offsetWidth || 0), 36);
-      const h = 24;
-      const m = 4;
-      const side = Math.min(14, Math.max(8, w * 0.12));
-      const cuspHalf = Math.min(12, Math.max(7, w * 0.07));
-      const shoulder = Math.min(20, Math.max(12, w * 0.16));
-      svg.setAttribute('viewBox', `0 0 ${w} ${h}`);
-      const topY = 7;
-      const bottomY = h - 7;
-      const cuspYTop = 1.5;
-      const cuspYBottom = h - 1.5;
-      const leftX = m;
-      const rightX = w - m;
-      const c = w / 2;
-      let d;
-      if(isTop){
-        d = [
-          `M ${leftX} ${bottomY}`,
-          `Q ${leftX} ${topY} ${leftX + side} ${topY}`,
-          `L ${c - shoulder} ${topY}`,
-          `Q ${c - cuspHalf} ${topY} ${c} ${cuspYTop}`,
-          `Q ${c + cuspHalf} ${topY} ${c + shoulder} ${topY}`,
-          `L ${rightX - side} ${topY}`,
-          `Q ${rightX} ${topY} ${rightX} ${bottomY}`
-        ].join(' ');
-      } else {
-        d = [
-          `M ${leftX} ${topY}`,
-          `Q ${leftX} ${bottomY} ${leftX + side} ${bottomY}`,
-          `L ${c - shoulder} ${bottomY}`,
-          `Q ${c - cuspHalf} ${bottomY} ${c} ${cuspYBottom}`,
-          `Q ${c + cuspHalf} ${bottomY} ${c + shoulder} ${bottomY}`,
-          `L ${rightX - side} ${bottomY}`,
-          `Q ${rightX} ${bottomY} ${rightX} ${topY}`
-        ].join(' ');
-      }
-      path.setAttribute('d', d);
-    }
-
-
-    function updateSideBraceSvg(braceEl){
-      if(!braceEl) return;
-      const svg = braceEl.querySelector('.type3-side-brace-svg');
-      const path = braceEl.querySelector('.type3-side-brace-path');
-      if(!svg || !path) return;
-      const h = Math.max(Math.round(braceEl.offsetHeight || 0), 60);
-      const w = Math.max(Math.round(braceEl.offsetWidth || 0), 28);
-      svg.setAttribute('viewBox', `0 0 ${w} ${h}`);
-      const x = 4;
-      const y1 = 0;
-      const y2 = h;
-      const mid = h / 2;
-      const inX = Math.max(16, w - 10);
-      const tipX = w - 3;
-      const shoulder = Math.min(24, Math.max(12, h * 0.15));
-      const cusp = Math.min(14, Math.max(9, h * 0.085));
-      const d = [
-        `M ${x} ${y1}`,
-        `Q ${x} ${y1 + shoulder * 0.42} ${inX} ${y1 + shoulder}`,
-        `L ${inX} ${mid - cusp}`,
-        `Q ${inX} ${mid} ${tipX} ${mid}`,
-        `Q ${inX} ${mid} ${inX} ${mid + cusp}`,
-        `L ${inX} ${y2 - shoulder}`,
-        `Q ${x} ${y2 - shoulder * 0.42} ${x} ${y2}`
-      ].join(' ');
-      path.setAttribute('d', d);
-    }
-
-    function positionType3SideTotal(){
-      const q = currentQuestion();
-      if(!q || (q.type !== 1 && q.type !== 2 && q.type !== 3)) return;
-
-      const areaEl = document.getElementById('modelArea');
-      if(!areaEl) return;
-      const targetHeight = type3SideLabelTarget.offsetHeight || 28;
-
-      const areaRect = areaEl.getBoundingClientRect();
-      const topRect = dropTop.getBoundingClientRect();
-      const bottomRect = dropBottom.getBoundingClientRect();
-
-      const overshootTop = 0;
-      const overshootBottom = 10;
-      const anchorWidth = 92;
-      const braceWidth = 22;
-      const edgeInset = 2;
-
-      const rawTop = Math.round(topRect.top - areaRect.top) - overshootTop;
-      const rawBottom = Math.round(bottomRect.bottom - areaRect.top) + overshootBottom;
-      const anchorTop = Math.max(0, rawTop);
-      const anchorBottom = Math.min(areaEl.offsetHeight, rawBottom);
-      const anchorHeight = Math.max(anchorBottom - anchorTop, 156);
-      const anchorLeft = Math.max(0, areaEl.offsetWidth - anchorWidth - edgeInset);
-
-      type3SideAnchor.style.left = `${anchorLeft}px`;
-      type3SideAnchor.style.top = `${anchorTop}px`;
-      type3SideAnchor.style.width = `${anchorWidth}px`;
-      type3SideAnchor.style.height = `${anchorHeight}px`;
-
-      const braceLeft = 8;
-      type3SideBrace.style.left = `${braceLeft}px`;
-      type3SideBrace.style.top = `0px`;
-      type3SideBrace.style.width = `${braceWidth}px`;
-      type3SideBrace.style.height = `${anchorHeight}px`;
-
-      type3SideLabelTarget.style.left = `${braceLeft + braceWidth + 6}px`;
-      type3SideLabelTarget.style.top = `${Math.round((anchorHeight / 2) - (targetHeight / 2))}px`;
-
-      updateSideBraceSvg(type3SideBrace);
-    }
-
-    function renderType3PartWhole(){
-      const q = currentQuestion();
-      if(!q || q.type !== 3){
-        type3PartWholeWrap.classList.remove('show');
+  });
+}
+function updateMissionCard(){
+  const total=isJourneyMode?JOURNEY_TARGET:Math.max(queue.length,1);
+  const done=isJourneyMode?Math.min(score,JOURNEY_TARGET):Math.min(score,total);
+  const currentNo=isJourneyMode?Math.min(getJourneyQuestionNumber(),JOURNEY_TARGET):Math.min(currentIndex+1,total);
+  missionTitle.textContent=isJourneyMode?`Game Journey — ${modeNames[currentMode]}`:`${modeNames[currentMode]} Practice`;
+  missionMeta.textContent=done>=total?`Completed ${total} of ${total}`:`Question ${currentNo} of ${total}`;
+  missionFill.style.width=total?`${(done/total)*100}%`:'0%';
+  missionStreakEl.textContent=`Progress streak: ${done} of ${total}`;
+  missionStars.forEach((star, idx)=>{star.classList.toggle('on', idx<done);star.style.display=idx<total?'flex':'none'});
+  updateModeButtons();
+}
+function updatePills(){
+  modePill.textContent=`Mode: ${modeNames[currentMode]}`;
+  if(isJourneyMode){
+    progressPill.textContent=`Question ${Math.min(getJourneyQuestionNumber(), JOURNEY_TARGET)} / ${JOURNEY_TARGET}`;
+    scorePill.textContent=`Score: ${score} / ${JOURNEY_TARGET}`;
+  }else{
+    const total=Math.max(queue.length,1);
+    progressPill.textContent=`Question ${Math.min(currentIndex+1,total)} / ${total}`;
+    scorePill.textContent=`Score: ${score} / ${total}`;
+  }
+  updateMissionCard();
+}
+function buildEquationHtml(q){if(q.type===1){return `<div class="eq-card"><div class="eq-line"><span class="eq-chip">${q.groupUnits} units</span><span class="eq-symbol-stack">=</span><span class="eq-chip">${q.total} −</span><input class="blank small" id="eq_subtract" inputmode="numeric"></div><div class="eq-line"><span class="eq-chip eq-chip-ghost">${q.groupUnits} units</span><span class="eq-symbol-stack">=</span><input class="blank" id="eq_remaining" inputmode="numeric"></div><div class="eq-line"><span class="eq-chip">1 unit</span><span class="eq-symbol-stack">=</span><input class="blank" id="eq_dividend" inputmode="numeric"> <span class="op-circle">÷</span> <input class="blank small" id="eq_divisor" inputmode="numeric"></div><div class="eq-line"><span class="eq-chip eq-chip-ghost">1 unit</span><span class="eq-symbol-stack">=</span><input class="blank" id="eq_each" inputmode="numeric"></div><div class="eq-line">${q.finalPrefix} <input class="blank" id="eq_final" inputmode="numeric"> ${q.finalSuffix}</div></div>`}return `<div class="eq-card"><div class="eq-line"><span class="eq-chip">${q.totalUnits} units</span><span class="eq-symbol-stack">=</span><span class="eq-chip">${q.total}</span></div><div class="eq-line"><span class="eq-chip">1 unit</span><span class="eq-symbol-stack">=</span><span class="eq-chip">${q.total} ÷</span><input class="blank small" id="eq_divisor" inputmode="numeric"></div><div class="eq-line"><span class="eq-chip eq-chip-ghost">1 unit</span><span class="eq-symbol-stack">=</span><input class="blank" id="eq_oneunit" inputmode="numeric"></div><div class="eq-line"><span class="eq-chip">${q.askedUnits} units</span><span class="eq-symbol-stack">=</span><input class="blank" id="eq_mul_a" inputmode="numeric"> <span class="op-circle">×</span> <input class="blank small" id="eq_mul_b" inputmode="numeric"></div><div class="eq-line"><span class="eq-chip eq-chip-ghost">${q.askedUnits} units</span><span class="eq-symbol-stack">=</span><input class="blank" id="eq_part" inputmode="numeric"></div><div class="eq-line">${q.finalPrefix} <input class="blank" id="eq_final" inputmode="numeric"> ${q.finalSuffix}</div></div>`}
+function clearModel(){if(solved)return;modelUnits=0;labelsPlaced={fixed:false,unknown:false,total:false};renderModel();resetMarkers();setFeedback('Model cleared. Build it again.','neutral')}
+function clearBlanks(){if(solved)return;equationHolder.querySelectorAll('input').forEach(input=>input.value='');resetMarkers();setFeedback('Blanks cleared. Fill in the equations again.','neutral')}
+function setFeedback(message,kind='neutral'){feedback.textContent=message;feedback.className='feedback';if(kind==='good')feedback.classList.add('good');if(kind==='bad')feedback.classList.add('bad')}
+function resetMarkers(){barZone.classList.remove('over','right','wrong');[fixedTarget,unknownTarget,totalTarget].forEach(el=>el.classList.remove('over','right','wrong'));document.querySelectorAll('.blank').forEach(el=>el.classList.remove('right','wrong'))}
+function createGhost(x,y){const ghost=document.createElement('div');ghost.className='ghost-unit';ghost.textContent='1 unit';ghost.style.left=`${x}px`;ghost.style.top=`${y}px`;document.body.appendChild(ghost);return ghost}
+function createTagGhost(text,x,y){const ghost=document.createElement('div');ghost.className='ghost-tag';ghost.textContent=text;ghost.style.left=`${x}px`;ghost.style.top=`${y}px`;document.body.appendChild(ghost);return ghost}
+function drawHorizontalBrace(braceEl,isTop=true){const svg=braceEl.querySelector('.brace-svg');const path=braceEl.querySelector('.brace-path');if(!svg||!path)return;const w=Math.max(Math.round(braceEl.offsetWidth||0),40),h=26;svg.setAttribute('viewBox',`0 0 ${w} ${h}`);const m=3,side=Math.min(14,Math.max(8,w*.12)),shoulder=Math.min(20,Math.max(11,w*.16)),cuspHalf=Math.min(12,Math.max(7,w*.07)),c=w/2,topY=7,bottomY=h-7,cuspYTop=1.5,cuspYBottom=h-1.5,leftX=m,rightX=w-m;let d='';if(isTop){d=[`M ${leftX} ${bottomY}`,`Q ${leftX} ${topY} ${leftX+side} ${topY}`,`L ${c-shoulder} ${topY}`,`Q ${c-cuspHalf} ${topY} ${c} ${cuspYTop}`,`Q ${c+cuspHalf} ${topY} ${c+shoulder} ${topY}`,`L ${rightX-side} ${topY}`,`Q ${rightX} ${topY} ${rightX} ${bottomY}`].join(' ')}else{d=[`M ${leftX} ${topY}`,`Q ${leftX} ${bottomY} ${leftX+side} ${bottomY}`,`L ${c-shoulder} ${bottomY}`,`Q ${c-cuspHalf} ${bottomY} ${c} ${cuspYBottom}`,`Q ${c+cuspHalf} ${bottomY} ${c+shoulder} ${bottomY}`,`L ${rightX-side} ${bottomY}`,`Q ${rightX} ${bottomY} ${rightX} ${topY}`].join(' ')}path.setAttribute('d',d)}
+function renderModel(){const q=currentQuestion();barTrack.innerHTML='';if(q.type===1){rowTopLabel.textContent='';rowTopLabel.style.display='none';topRow.style.gridTemplateColumns='1fr';topRow.style.gap='0';rowBottomLabel.textContent='';bottomRow.style.display='none'}else{rowTopLabel.style.display='flex';topRow.style.gridTemplateColumns='92px 1fr';topRow.style.gap='12px';rowTopLabel.textContent=q.bottomLabel;rowBottomLabel.textContent='';bottomRow.querySelector('.row-label').style.visibility='hidden';bottomRow.style.display='none'}if(q.type===1){const totalSlots=1+q.groupUnits;for(let i=0;i<totalSlots;i++){const slot=document.createElement('div');slot.className='slot';if(i===0)slot.classList.add('fixed');else if(i<=modelUnits)slot.classList.add('group');else slot.classList.add('empty');barTrack.appendChild(slot)}}else{for(let i=0;i<q.totalUnits;i++){const slot=document.createElement('div');slot.className='slot';if(i<modelUnits)slot.classList.add(i<q.askedUnits?'type2-give':'type2-rest');else slot.classList.add('empty');barTrack.appendChild(slot)}}requestAnimationFrame(positionTargetsAndBraces)}
+function positionTargetsAndBraces(){const q=currentQuestion();const slots=Array.from(barTrack.querySelectorAll('.slot'));if(!slots.length)return;[fixedTarget,unknownTarget,totalTarget].forEach(el=>{el.classList.remove('show');el.style.left='';el.style.top=''});[topLeftBrace,topRightBrace,bottomWholeBrace].forEach(el=>el.classList.remove('show'));const zoneLeft=barZone.offsetLeft+10,zoneTop=barZone.offsetTop+8,slotW=slots[0].offsetWidth-2,slotH=slots[0].offsetHeight,totalSlots=slots.length,fullLeft=zoneLeft,fullWidth=slotW*totalSlots,braceH=26;if(q.type===1){const fixedLeft=fullLeft,fixedWidth=slotW,askLeft=fullLeft+(slotW*q.groupUnits),askWidth=slotW;topLeftBrace.style.left=`${fixedLeft+2}px`;topLeftBrace.style.top=`${zoneTop-braceH-2}px`;topLeftBrace.style.width=`${fixedWidth-4}px`;topLeftBrace.classList.add('show');drawHorizontalBrace(topLeftBrace,true);topRightBrace.style.left=`${askLeft+2}px`;topRightBrace.style.top=`${zoneTop-braceH-2}px`;topRightBrace.style.width=`${askWidth-4}px`;topRightBrace.classList.add('show');drawHorizontalBrace(topRightBrace,true);bottomWholeBrace.style.left=`${fullLeft+2}px`;bottomWholeBrace.style.top=`${zoneTop+slotH+4}px`;bottomWholeBrace.style.width=`${fullWidth-4}px`;bottomWholeBrace.classList.add('show');drawHorizontalBrace(bottomWholeBrace,false);fixedTarget.classList.add('show');fixedTarget.style.left=`${fixedLeft+(fixedWidth/2)-29}px`;fixedTarget.style.top=`${zoneTop-braceH-34}px`;unknownTarget.classList.add('show');unknownTarget.style.left=`${askLeft+(askWidth/2)-29}px`;unknownTarget.style.top=`${zoneTop-braceH-34}px`;totalTarget.classList.add('show');totalTarget.style.left=`${fullLeft+(fullWidth/2)-29}px`;totalTarget.style.top=`${zoneTop+slotH+braceH+10}px`}else{const askLeft=fullLeft,askWidth=slotW*q.askedUnits;topRightBrace.style.left=`${askLeft+2}px`;topRightBrace.style.top=`${zoneTop-braceH-2}px`;topRightBrace.style.width=`${askWidth-4}px`;topRightBrace.classList.add('show');drawHorizontalBrace(topRightBrace,true);bottomWholeBrace.style.left=`${fullLeft+2}px`;bottomWholeBrace.style.top=`${zoneTop+slotH+4}px`;bottomWholeBrace.style.width=`${fullWidth-4}px`;bottomWholeBrace.classList.add('show');drawHorizontalBrace(bottomWholeBrace,false);unknownTarget.classList.add('show');unknownTarget.style.left=`${askLeft+(askWidth/2)-29}px`;unknownTarget.style.top=`${zoneTop-braceH-34}px`;totalTarget.classList.add('show');totalTarget.style.left=`${fullLeft+(fullWidth/2)-29}px`;totalTarget.style.top=`${zoneTop+slotH+braceH+10}px`}fillTargets()}
+function fillTargets(){const q=currentQuestion();fixedTarget.innerHTML=labelsPlaced.fixed?`<span class="placed-tag">${q.fixedAmount}</span>`:'&nbsp;';fixedTarget.classList.toggle('filled',labelsPlaced.fixed);unknownTarget.innerHTML=labelsPlaced.unknown?`<span class="placed-tag">?</span>`:'&nbsp;';unknownTarget.classList.toggle('filled',labelsPlaced.unknown);totalTarget.innerHTML=labelsPlaced.total?`<span class="placed-tag">${q.total}</span>`:'&nbsp;';totalTarget.classList.toggle('filled',labelsPlaced.total);if(q.type===1){fixedTarget.style.display='';topLeftBrace.style.display=''}else{fixedTarget.style.display='none';topLeftBrace.style.display='none'}}
+function renderQuestion(){const q=currentQuestion();solved=false;modelUnits=0;labelsPlaced={fixed:false,unknown:false,total:false};typeBadge.textContent=q.typeLabel;questionText.textContent=q.prompt;miniNote.textContent=q.miniNote;setLabelToolbox(q);equationHolder.innerHTML=buildEquationHtml(q);renderModel();resetMarkers();celebrate.classList.remove('show');nextBtn.disabled=true;nextBtn.textContent='Next Question';setFeedback('Start by building the model.','neutral');rewardScreen.classList.remove('show');endScreen.classList.remove('show');gameGrid.style.display='grid';updatePills();clearWorking();requestViewportFit()}
+function showEndScreen(){gameGrid.style.display='none';rewardScreen.classList.remove('show');endScreen.classList.add('show');endText.textContent=`You got ${score} out of ${Math.max(queue.length,1)} correct in ${modeNames[currentMode]} mode.`}
+function showRewardScreen(){gameGrid.style.display='none';endScreen.classList.remove('show');rewardScreen.classList.add('show');rewardText.textContent=`You completed all ${JOURNEY_TARGET} questions in the full adventure. Final score: ${score} out of ${JOURNEY_TARGET}.`;updatePills();updateMissionCard();requestViewportFit()}
+function startMode(mode, resetScore=true, fromJourney=false){
+  currentMode=mode;
+  if(fromJourney){
+    queue=(journeyQueues?.[mode] || []);
+    currentIndex=0;
+    isJourneyMode=true;
+  }else{
+    queue=getModeQuestions(mode);
+    currentIndex=0;
+    isJourneyMode=false;
+    if(resetScore) score=0;
+    modeProgress={type1:0,type2:0,mixed:0};
+  }
+  if(!fromJourney) journeyQueues=null;
+  updateModeButtons();
+  renderQuestion();
+}
+function startJourney(){
+  score=0;
+  isJourneyMode=true;
+  modeProgress={type1:0,type2:0,mixed:0};
+  journeyQueues=buildJourneyQueues();
+  startMode('type1', false, true);
+}
+function nextQuestion(){
+  if(!solved)return;
+  if(isJourneyMode){
+    modeProgress[currentMode]=Math.max(modeProgress[currentMode], currentIndex+1);
+    if(currentIndex>=queue.length-1){
+      const idx=JOURNEY_ORDER.indexOf(currentMode);
+      if(idx>=0 && idx<JOURNEY_ORDER.length-1){
+        startMode(JOURNEY_ORDER[idx+1], false, true);
         return;
       }
-      type3PartWholeWrap.classList.add('show');
-      type3PartWholeRowLabel.textContent = q.finalName;
-      const leftWeight = Math.max(q.unitValue, 1);
-      const rightWeight = Math.max(q.extraAmount, 1);
-      type3PartWholeBar.style.gridTemplateColumns = `${leftWeight}fr ${rightWeight}fr`;
-      type3PartWholeLabels.style.gridTemplateColumns = `${leftWeight}fr ${rightWeight}fr`;
-      type3PartStartLabel.textContent = '1 unit';
-      type3PartExtraLabel.textContent = String(q.extraAmount);
-      requestAnimationFrame(() => updateBraceSvg(type3WholeBrace, true));
+      showRewardScreen();
+      return;
     }
-
-    function measureUnitWidth(zone, rowClass){
-      const existing = zone.querySelector('.model-unit');
-      if(existing) return existing.offsetWidth;
-      const tmp = document.createElement('div');
-      tmp.className = `model-unit ${rowClass}`;
-      tmp.style.visibility = 'hidden';
-      tmp.style.position = 'absolute';
-      zone.appendChild(tmp);
-      const w = tmp.offsetWidth || 48;
-      tmp.remove();
-      return w;
-    }
-
-    function positionLabelAndBrace(targetEl, braceEl, zoneEl, unitsCount, placement, rowClass){
-      const unitWidth = measureUnitWidth(zoneEl, rowClass);
-      const padLeft = parseFloat(getComputedStyle(zoneEl).paddingLeft) || 10;
-      const left = zoneEl.offsetLeft + padLeft;
-      const width = Math.max(unitWidth * Math.max(unitsCount, 1), 30);
-      const braceHeight = Math.max(braceEl.offsetHeight || 24, 24);
-      const targetWidth = targetEl.offsetWidth || 56;
-      const targetHeight = targetEl.offsetHeight || 28;
-      braceEl.style.left = `${left}px`;
-      braceEl.style.width = `${width}px`;
-      if(placement === 'top'){
-        braceEl.style.top = `${zoneEl.offsetTop - braceHeight + 2}px`;
-        targetEl.style.left = `${left + (width / 2) - (targetWidth / 2)}px`;
-        targetEl.style.top = `${zoneEl.offsetTop - braceHeight - targetHeight - 6}px`;
-      } else {
-        braceEl.style.top = `${zoneEl.offsetTop + zoneEl.offsetHeight - 2}px`;
-        targetEl.style.left = `${left + (width / 2) - (targetWidth / 2)}px`;
-        targetEl.style.top = `${zoneEl.offsetTop + zoneEl.offsetHeight + braceHeight + 6}px`;
-      }
-      updateBraceSvg(braceEl, placement === 'top');
-    }
-
-    function positionAsManyLabels(){
-      const q = currentQuestion();
-      const config = getLabelConfig(q);
-      if(!config) return;
-
-      const liveTopUnits = Math.max(modelState.top, 1);
-      const liveBottomUnits = Math.max(modelState.bottom, 1);
-
-      positionLabelAndBrace(topLabelTarget, topBrace, dropTop, liveTopUnits, 'top', 'top');
-      if(q.type === 1 || q.type === 2 || q.type === 3){
-        positionType3SideTotal();
-      } else {
-        positionLabelAndBrace(bottomLabelTarget, bottomBrace, dropBottom, liveBottomUnits, 'bottom', 'bottom');
-      }
-    }
-
-    function renderLabelTargets(){
-      const q = currentQuestion();
-      const config = getLabelConfig(q);
-      const show = !!config;
-      [topLabelTarget, bottomLabelTarget, topBrace, bottomBrace, type3SideAnchor, type3SideBrace, type3SideLabelTarget].forEach(el => el.classList.remove('show','filled','over','right','wrong'));
-      if(!show){
-        topLabelTarget.innerHTML = '&nbsp;';
-        bottomLabelTarget.innerHTML = '&nbsp;';
-        type3SideLabelTarget.innerHTML = '&nbsp;';
-        topValueTag.textContent = '6';
-        bottomValueTag.textContent = '?';
-        labelToolHelp.textContent = '';
-        return;
-      }
-      topValueTag.textContent = config.topText;
-      bottomValueTag.textContent = config.bottomText;
-      labelToolHelp.textContent = config.help || '';
-      topLabelTarget.classList.add('show');
-
-      if(modelState.top > 0){
-        topBrace.classList.add('show');
-      }
-
-      if(q.type === 1 || q.type === 2 || q.type === 3){
-        type3SideAnchor.classList.add('show');
-        type3SideLabelTarget.classList.add('show');
-        if(modelState.top > 0 || modelState.bottom > 0){
-          type3SideBrace.classList.add('show');
-        }
-      } else {
-        bottomLabelTarget.classList.add('show');
-        if(modelState.bottom > 0){
-          bottomBrace.classList.add('show');
-        }
-      }
-
-      if(labelState.top){
-        topLabelTarget.innerHTML = `<span class="placed-tag">${config.topText}</span>`;
-        topLabelTarget.classList.add('filled');
-      } else {
-        topLabelTarget.innerHTML = '&nbsp;';
-      }
-
-      if(q.type === 1 || q.type === 2 || q.type === 3){
-        bottomLabelTarget.innerHTML = '&nbsp;';
-        if(labelState.bottom){
-          type3SideLabelTarget.innerHTML = `<span class="placed-tag">${config.bottomText}</span>`;
-          type3SideLabelTarget.classList.add('filled');
-        } else {
-          type3SideLabelTarget.innerHTML = '&nbsp;';
-        }
-      } else {
-        type3SideLabelTarget.innerHTML = '&nbsp;';
-        if(labelState.bottom){
-          bottomLabelTarget.innerHTML = `<span class="placed-tag">${config.bottomText}</span>`;
-          bottomLabelTarget.classList.add('filled');
-        } else {
-          bottomLabelTarget.innerHTML = '&nbsp;';
-        }
-      }
-      requestAnimationFrame(() => {
-        positionAsManyLabels();
-        renderType3PartWhole();
-      });
-    }
-
-    function getJourneyQuestionNumber(){
-      const idx = JOURNEY_ORDER.indexOf(currentMode);
-      if(idx < 0) return currentIndex + 1;
-      return idx * 2 + currentIndex + 1;
-    }
-
-    function updatePills(){
-      modePill.textContent = `Mode: ${modeNames[currentMode]}`;
-      if(isJourneyMode){
-        progressPill.textContent = `Question ${Math.min(getJourneyQuestionNumber(), JOURNEY_TARGET)} / ${JOURNEY_TARGET}`;
-        scorePill.textContent = `Score: ${score} / ${JOURNEY_TARGET}`;
-      }else{
-        const total = Math.max(queue.length, 1);
-        progressPill.textContent = `Question ${Math.min(currentIndex + 1, total)} / ${total}`;
-        scorePill.textContent = `Score: ${score} / ${total}`;
-      }
-    }
-
-    function updateModeButtons(){
-      modeButtons.forEach(btn => {
-        const mode = btn.dataset.mode;
-        const baseLabel = mode === 'mixed' ? 'Mixed Practice' : modeNames[mode];
-        btn.classList.toggle('active', mode === currentMode);
-
-        if(isJourneyMode && JOURNEY_ORDER.includes(mode)){
-          const done = (modeProgress[mode] || 0) >= ((journeyQueues?.[mode]?.length) || MODE_TARGETS[mode] || 0);
-          btn.textContent = done ? `${baseLabel} ✓` : baseLabel;
-        }else{
-          btn.textContent = baseLabel;
-        }
-      });
-    }
-
-    function updateMissionCard(){
-      const total = isJourneyMode ? JOURNEY_TARGET : Math.max(queue.length, 1);
-      const done = isJourneyMode ? Math.min(score, JOURNEY_TARGET) : Math.min(score, total);
-      const currentQuestionNo = isJourneyMode
-        ? Math.min(getJourneyQuestionNumber(), JOURNEY_TARGET)
-        : Math.min(currentIndex + 1, total);
-
-      missionTitle.textContent = isJourneyMode ? `Game Journey — ${modeNames[currentMode]}` : `${modeNames[currentMode]} Practice`;
-      missionMeta.textContent = done >= total
-        ? `Completed ${total} of ${total}`
-        : `Question ${currentQuestionNo} of ${total}`;
-      missionFill.style.width = total ? `${(done / total) * 100}%` : '0%';
-      missionStreakEl.textContent = `Progress streak: ${done} of ${total}`;
-
-      missionStars.forEach((star, idx) => {
-        star.classList.toggle('on', idx < done);
-        star.style.display = idx < total ? 'flex' : 'none';
-      });
-
-      updateModeButtons();
-    }
-
-    function buildEquationHtml(q){
-      if(q.type === 1){
-        return `
-          <div class="eq-card">
-            <div class="eq-line"><span class="eq-chip">1 unit = ${q.knownUnitValue}</span></div>
-            <div class="eq-line"><span class="eq-chip">${q.totalUnits} units</span><span class="eq-symbol-stack">=</span><input class="blank small" id="eq_factor1" inputmode="numeric" aria-label="factor 1"> × <input class="blank small" id="eq_factor2" inputmode="numeric" aria-label="factor 2"></div>
-            <div class="eq-line"><span class="eq-chip eq-chip-ghost">${q.totalUnits} units</span><span class="eq-symbol-stack">=</span><input class="blank" id="eq_total" inputmode="numeric" aria-label="total"></div>
-            <div class="eq-line">${q.finalLine} <input class="blank" id="eq_final" inputmode="numeric" aria-label="final answer"> ${q.finalLineSuffix}</div>
-          </div>
-        `;
-      }
-      if(q.type === 2){
-        return `
-          <div class="eq-card">
-            <div class="eq-line"><span class="eq-chip">${q.knownUnits} units = ${q.knownTotal}</span></div>
-            <div class="eq-line"><span class="eq-chip">1 unit = ${q.knownTotal} ÷</span><input class="blank small" id="eq_divisor" inputmode="numeric" aria-label="number of units"> = <input class="blank" id="eq_oneUnit" inputmode="numeric" aria-label="1 unit value"></div>
-            <div class="eq-line"><span class="eq-chip">${q.totalUnits} units</span><span class="eq-symbol-stack">=</span><input class="blank small" id="eq_factor1" inputmode="numeric" aria-label="factor 1"> × <input class="blank small" id="eq_factor2" inputmode="numeric" aria-label="factor 2"></div>
-            <div class="eq-line"><span class="eq-chip eq-chip-ghost">${q.totalUnits} units</span><span class="eq-symbol-stack">=</span><input class="blank" id="eq_total" inputmode="numeric" aria-label="total"></div>
-            <div class="eq-line">${q.finalLine} <input class="blank" id="eq_final" inputmode="numeric" aria-label="final answer"> ${q.finalLineSuffix}</div>
-          </div>
-        `;
-      }
-      return `
-        <div class="eq-card">
-          <div class="eq-line"><span class="eq-chip">${q.sumUnits} units = ${q.totalTogether}</span></div>
-          <div class="eq-line"><span class="eq-chip">1 unit = ${q.totalTogether} ÷</span><input class="blank small" id="eq_divisor" inputmode="numeric" aria-label="number of units"> = <input class="blank" id="eq_oneUnit" inputmode="numeric" aria-label="1 unit value"></div>
-          <div class="eq-line"><span class="eq-chip">Then</span><input class="blank small" id="eq_startAmount" inputmode="numeric" aria-label="starting amount"> + <input class="blank small" id="eq_extra" inputmode="numeric" aria-label="extra amount"> = <input class="blank" id="eq_finalCalc" inputmode="numeric" aria-label="new total"></div>
-          <div class="eq-line">${q.finalLine} <input class="blank" id="eq_final" inputmode="numeric" aria-label="final answer"> ${q.finalLineSuffix}</div>
-        </div>
-      `;
-    }
-
-    function currentQuestion(){
-      return queue[currentIndex];
-    }
-
-    function renderModel(){
-      dropTop.innerHTML = '';
-      dropBottom.innerHTML = '';
-
-      for(let i = 0; i < modelState.top; i++){
-        const box = document.createElement('button');
-        box.type = 'button';
-        box.className = 'model-unit top';
-        box.dataset.row = 'top';
-        box.title = 'Click to remove one unit';
-        dropTop.appendChild(box);
-      }
-      for(let i = 0; i < modelState.bottom; i++){
-        const box = document.createElement('button');
-        box.type = 'button';
-        box.className = 'model-unit bottom';
-        box.dataset.row = 'bottom';
-        box.title = 'Click to remove one unit';
-        dropBottom.appendChild(box);
-      }
-
-      topHelper.textContent = `Units in this row: ${modelState.top}`;
-      bottomHelper.textContent = `Units in this row: ${modelState.bottom}`;
-      renderLabelTargets();
-    }
-
-    function resetMarkers(){
-      dropTop.classList.remove('wrong','right','over');
-      dropBottom.classList.remove('wrong','right','over');
-      [topLabelTarget, bottomLabelTarget, type3SideLabelTarget].forEach(el => el.classList.remove('over','right','wrong'));
-      document.querySelectorAll('.blank').forEach(el => el.classList.remove('wrong','right'));
-    }
-
-    function setFeedback(message, kind = 'neutral'){
-      feedback.textContent = message;
-      feedback.className = 'feedback';
-      if(kind === 'good') feedback.classList.add('good');
-      if(kind === 'bad') feedback.classList.add('bad');
-    }
-
-    function clearBlanks(){
-      equationHolder.querySelectorAll('input').forEach(input => input.value = '');
-      labelState = { top:false, bottom:false };
-      renderLabelTargets();
-      resetMarkers();
-      celebrate.classList.remove('show');
-      if(!solved) setFeedback('Blanks cleared. Now fill in the equation.', 'neutral');
-    }
-
-    function clearModel(){
-      modelState.top = 0;
-      modelState.bottom = 0;
-      renderModel();
-      resetMarkers();
-      celebrate.classList.remove('show');
-      if(!solved) setFeedback('Model cleared. Drag the unit blocks again.', 'neutral');
-    }
-
-    function renderQuestion(){
-      const q = currentQuestion();
-      solved = false;
-      modelState = { top: 0, bottom: 0 };
-      labelState = { top:false, bottom:false };
-      questionText.textContent = q.prompt;
-      typeBadge.textContent = q.typeLabel;
-      miniNote.textContent = q.miniNote;
-      rowTopLabel.textContent = q.rowTopLabel;
-      rowBottomLabel.textContent = q.rowBottomLabel;
-      modelArea.classList.toggle('side-total-layout', q.type === 1 || q.type === 2 || q.type === 3);
-      modelArea.classList.toggle('type1-layout', q.type === 1);
-      modelArea.classList.toggle('type2-layout', q.type === 2);
-      modelArea.classList.toggle('type3-layout', q.type === 3);
-      equationHolder.innerHTML = buildEquationHtml(q);
-      renderType3PartWhole();
-      renderModel();
-      nextBtn.disabled = true;
-      nextBtn.textContent = 'Next Question';
-      celebrate.classList.remove('show');
-      resetMarkers();
-      setupWorkingCanvas(true);
-      clearWorking();
-      setFeedback('Start by building the model.', 'neutral');
-      updatePills();
-      updateMissionCard();
-    }
-
-    function initJourney(){
-      score = 0;
-      journeyProgress = 0;
-      modeProgress = { type1: 0, type2: 0, type3: 0, mixed: 0 };
-      journeyQueues = buildJourneyQueues();
-      modeQueues = { ...journeyQueues };
-      isJourneyMode = true;
-    }
-
-    function showModeClearedScreen(mode){
-      gameGrid.style.display = 'none';
-      rewardScreen.classList.remove('show');
-      endScreen.classList.add('show');
-      document.getElementById('restartBtn').textContent = `Play ${modeNames[mode]} Again`;
-      endText.textContent = `${modeNames[mode]} is cleared. Final score: ${score} out of ${Math.max(queue.length, 1)}.`;
-    }
-
-    function startMode(mode, resetScore = false, fromJourney = false){
-      currentMode = mode;
-
-      if(fromJourney){
-        isJourneyMode = true;
-        queue = (journeyQueues?.[mode] || []);
-        currentIndex = Math.min(modeProgress[mode] || 0, Math.max(queue.length - 1, 0));
-      }else{
-        isJourneyMode = false;
-        queue = getModeQuestions(mode);
-        currentIndex = 0;
-        modeProgress = { type1: 0, type2: 0, type3: 0, mixed: 0 };
-        if(resetScore) score = 0;
-      }
-
-      rewardScreen.classList.remove('show');
-      endScreen.classList.remove('show');
-      gameGrid.style.display = 'grid';
-      renderQuestion();
-      updatePills();
-      updateMissionCard();
-    }
-
-    function startJourney(){
-      initJourney();
-      startMode('type1', false, true);
-    }
-
-    function toNumber(id){
-      const el = document.getElementById(id);
-      if(!el) return NaN;
-      const val = el.value.trim();
-      return val === '' ? NaN : Number(val);
-    }
-
-    function markInput(id, ok){
-      const el = document.getElementById(id);
-      if(!el) return;
-      el.classList.remove('wrong','right');
-      el.classList.add(ok ? 'right' : 'wrong');
-    }
-
-    let audioCtx = null;
-    const correctAudio = new Audio('correct.mp3');
-    const wrongAudio = new Audio('wrong.mp3');
-    const tadaAudio = new Audio('tada.mp3');
-    correctAudio.preload = 'auto';
-    wrongAudio.preload = 'auto';
-    tadaAudio.preload = 'auto';
-
-    function playAudioFile(audioEl){
-      try{
-        audioEl.pause();
-        audioEl.currentTime = 0;
-        const p = audioEl.play();
-        if(p && typeof p.catch === 'function'){
-          p.catch(() => {});
-        }
-        return true;
-      }catch(_err){
-        return false;
-      }
-    }
-
-    function getAudioCtx(){
-      if(!audioCtx){
-        const Ctx = window.AudioContext || window.webkitAudioContext;
-        if(!Ctx) return null;
-        audioCtx = new Ctx();
-      }
-      if(audioCtx.state === 'suspended'){
-        audioCtx.resume();
-      }
-      return audioCtx;
-    }
-
-    function tone(startAt, frequency, duration, type = 'sine', volume = 0.05){
-      const ctx = getAudioCtx();
-      if(!ctx) return startAt;
-      const osc = ctx.createOscillator();
-      const gain = ctx.createGain();
-      osc.type = type;
-      osc.frequency.setValueAtTime(frequency, startAt);
-      gain.gain.setValueAtTime(0.0001, startAt);
-      gain.gain.exponentialRampToValueAtTime(volume, startAt + 0.02);
-      gain.gain.exponentialRampToValueAtTime(0.0001, startAt + duration);
-      osc.connect(gain);
-      gain.connect(ctx.destination);
-      osc.start(startAt);
-      osc.stop(startAt + duration + 0.03);
-      return startAt + duration;
-    }
-
-    function playCorrectSound(){
-      if(playAudioFile(correctAudio)) return;
-      const ctx = getAudioCtx();
-      if(!ctx) return;
-      let t = ctx.currentTime + 0.01;
-      t = tone(t, 523.25, 0.10, 'triangle', 0.05);
-      t = tone(t + 0.02, 659.25, 0.12, 'triangle', 0.055);
-      t = tone(t + 0.02, 783.99, 0.14, 'triangle', 0.06);
-      tone(t + 0.03, 1046.50, 0.22, 'triangle', 0.06);
-    }
-
-    function playWrongSound(){
-      if(playAudioFile(wrongAudio)) return;
-      const ctx = getAudioCtx();
-      if(!ctx) return;
-      let t = ctx.currentTime + 0.01;
-      t = tone(t, 220, 0.12, 'sawtooth', 0.035);
-      tone(t + 0.01, 174.61, 0.20, 'sawtooth', 0.03);
-    }
-
-    function playTadaSound(){
-      if(playAudioFile(tadaAudio)) return;
-      const ctx = getAudioCtx();
-      if(!ctx) return;
-      let t = ctx.currentTime + 0.02;
-      t = tone(t, 523.25, 0.10, 'triangle', 0.05);
-      t = tone(t + 0.02, 659.25, 0.12, 'triangle', 0.055);
-      t = tone(t + 0.02, 783.99, 0.14, 'triangle', 0.06);
-      t = tone(t + 0.03, 1046.50, 0.18, 'triangle', 0.065);
-      t = tone(t + 0.03, 1318.51, 0.20, 'triangle', 0.07);
-      tone(t + 0.04, 1567.98, 0.28, 'triangle', 0.075);
-    }
-
-    function checkQuestion(){
-      if(solved){
-        nextQuestion();
-        return;
-      }
-      const q = currentQuestion();
-      resetMarkers();
-
-      const modelCorrect = modelState.top === q.expectedTopUnits && modelState.bottom === q.expectedBottomUnits;
-      dropTop.classList.add(modelState.top === q.expectedTopUnits ? 'right' : 'wrong');
-      dropBottom.classList.add(modelState.bottom === q.expectedBottomUnits ? 'right' : 'wrong');
-
-      let blanksCorrect = true;
-
-      const labelsCorrect = labelState.top && labelState.bottom;
-      topLabelTarget.classList.add(labelState.top ? 'right' : 'wrong');
-      const totalTarget = (q.type === 1 || q.type === 2 || q.type === 3) ? type3SideLabelTarget : bottomLabelTarget;
-      totalTarget.classList.add(labelState.bottom ? 'right' : 'wrong');
-
-      if(q.type === 1){
-        const factor1 = toNumber('eq_factor1');
-        const factor2 = toNumber('eq_factor2');
-        const total = toNumber('eq_total');
-        const final = toNumber('eq_final');
-
-        const factorsOk = (
-          (factor1 === q.knownUnitValue && factor2 === q.totalUnits) ||
-          (factor1 === q.totalUnits && factor2 === q.knownUnitValue)
-        );
-
-        const checks = {
-          eq_factor1: factorsOk && !Number.isNaN(factor1),
-          eq_factor2: factorsOk && !Number.isNaN(factor2),
-          eq_total: total === q.finalAnswer,
-          eq_final: final === q.finalAnswer
-        };
-
-        Object.entries(checks).forEach(([id, ok]) => {
-          markInput(id, ok);
-          if(!ok) blanksCorrect = false;
-        });
-      } else if(q.type === 2){
-        const divisor = toNumber('eq_divisor');
-        const oneUnit = toNumber('eq_oneUnit');
-        const factor1 = toNumber('eq_factor1');
-        const factor2 = toNumber('eq_factor2');
-        const total = toNumber('eq_total');
-        const final = toNumber('eq_final');
-
-        const factorsOk = (
-          (factor1 === q.unitValue && factor2 === q.totalUnits) ||
-          (factor1 === q.totalUnits && factor2 === q.unitValue)
-        );
-
-        const checks = {
-          eq_divisor: divisor === q.knownUnits,
-          eq_oneUnit: oneUnit === q.unitValue,
-          eq_factor1: factorsOk && !Number.isNaN(factor1),
-          eq_factor2: factorsOk && !Number.isNaN(factor2),
-          eq_total: total === q.finalAnswer,
-          eq_final: final === q.finalAnswer
-        };
-
-        Object.entries(checks).forEach(([id, ok]) => {
-          markInput(id, ok);
-          if(!ok) blanksCorrect = false;
-        });
-      } else {
-        const divisor = toNumber('eq_divisor');
-        const oneUnit = toNumber('eq_oneUnit');
-        const startAmount = toNumber('eq_startAmount');
-        const extra = toNumber('eq_extra');
-        const finalCalc = toNumber('eq_finalCalc');
-        const final = toNumber('eq_final');
-
-        const addOk = (
-          (startAmount === q.unitValue && extra === q.extraAmount) ||
-          (startAmount === q.extraAmount && extra === q.unitValue)
-        );
-
-        const checks = {
-          eq_divisor: divisor === q.sumUnits,
-          eq_oneUnit: oneUnit === q.unitValue,
-          eq_startAmount: addOk && !Number.isNaN(startAmount),
-          eq_extra: addOk && !Number.isNaN(extra),
-          eq_finalCalc: finalCalc === q.finalAnswer,
-          eq_final: final === q.finalAnswer
-        };
-
-        Object.entries(checks).forEach(([id, ok]) => {
-          markInput(id, ok);
-          if(!ok) blanksCorrect = false;
-        });
-      }
-      if(!labelsCorrect) blanksCorrect = false;
-
-      if(modelCorrect && blanksCorrect){
-        if(!solved){
-          score += 1;
-          journeyProgress = Math.min(JOURNEY_TARGET, journeyProgress + 1);
-          solved = true;
-        }
-        updatePills();
-        updateMissionCard();
-        celebrate.classList.add('show');
-        setFeedback('Excellent! Your model and equation are both correct.', 'good');
-        playCorrectSound();
-        nextBtn.disabled = false;
-        if(isJourneyMode && score >= JOURNEY_TARGET){
-          nextBtn.textContent = 'Unlock Pet';
-        } else if(currentIndex === queue.length - 1){
-          nextBtn.textContent = isJourneyMode ? 'Continue Journey' : 'See Results';
-        } else {
-          nextBtn.textContent = 'Next Question';
-        }
-        return;
-      }
-
-      updateMissionCard();
-      celebrate.classList.remove('show');
-      nextBtn.disabled = true;
-      let message = '';
-      if(!modelCorrect && !blanksCorrect){
-        message = `Check both parts. ${q.rowTopLabel} should have ${q.expectedTopUnits} unit(s), ${q.rowBottomLabel} should have ${q.expectedBottomUnits} unit(s), and both labels should be placed.`;
-      } else if(!modelCorrect){
-        message = `Your equation is close, but the bar model is not right yet. ${q.rowTopLabel}: ${q.expectedTopUnits} unit(s). ${q.rowBottomLabel}: ${q.expectedBottomUnits} unit(s).`;
-      } else {
-        message = 'Your model looks good. Now check the value label, the ? label, and the numbers in the blanks.';
-      }
-      setFeedback(message, 'bad');
-      playWrongSound();
-    }
-
-    function showRewardScreen(){
-      gameGrid.style.display = 'none';
-      endScreen.classList.remove('show');
-      rewardScreen.classList.add('show');
-      rewardTitle.textContent = 'Stage 7 unlocked!';
-      rewardText.textContent = `You completed all ${JOURNEY_TARGET} questions across Type 1, Type 2 and Type 3. Final score: ${score} out of ${JOURNEY_TARGET}.`;
-      progressPill.textContent = `Finished ${JOURNEY_TARGET} / ${JOURNEY_TARGET}`;
-      updateMissionCard();
-      playTadaSound();
-      requestViewportFit();
-    }
-
-    function nextQuestion(){
-      if(!solved) return;
-
-      if(isJourneyMode){
-        modeProgress[currentMode] = Math.max(modeProgress[currentMode], currentIndex + 1);
-
-        if(score >= JOURNEY_TARGET){
-          showRewardScreen();
-          return;
-        }
-
-        if(currentIndex >= queue.length - 1){
-          const idx = JOURNEY_ORDER.indexOf(currentMode);
-          if(idx >= 0 && idx < JOURNEY_ORDER.length - 1){
-            startMode(JOURNEY_ORDER[idx + 1], false, true);
-            return;
-          }
-          showRewardScreen();
-          return;
-        }
-
-        currentIndex += 1;
-        renderQuestion();
-        return;
-      }
-
-      if(currentIndex >= queue.length - 1){
-        showModeClearedScreen(currentMode);
-        return;
-      }
-
-      currentIndex += 1;
-      renderQuestion();
-    }
-
-    function addUnitToRow(row){
-      if(solved) return;
-      const q = currentQuestion();
-      const maxUnits = Math.max(q.expectedTopUnits, q.expectedBottomUnits) + 2;
-      if(modelState[row] >= maxUnits) return;
-      modelState[row] += 1;
-      renderModel();
-      resetMarkers();
-      setFeedback('Nice. Keep building the model.', 'neutral');
-    }
-
-    function createGhost(x, y){
-      const ghost = document.createElement('div');
-      ghost.className = 'ghost-unit';
-      ghost.textContent = '1 unit';
-      ghost.style.left = `${x}px`;
-      ghost.style.top = `${y}px`;
-      document.body.appendChild(ghost);
-      return ghost;
-    }
-
-    function rowAtPoint(x, y){
-      for(const zone of [dropTop, dropBottom]){
-        const rect = zone.getBoundingClientRect();
-        if(x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom){
-          return zone;
-        }
-      }
-      return null;
-    }
-
-    function labelTargetAtPoint(x, y){
-      for(const item of [{el:topLabelTarget, key:'top'}, {el:bottomLabelTarget, key:'bottom'}, {el:type3SideLabelTarget, key:'bottom'}]){
-        if(!item.el.classList.contains('show')) continue;
-        const rect = item.el.getBoundingClientRect();
-        if(x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom){
-          return item;
-        }
-      }
-      return null;
-    }
-
-    function moveGhost(x, y){
-      if(!dragState) return;
-      dragState.ghost.style.left = `${x}px`;
-      dragState.ghost.style.top = `${y}px`;
-      [dropTop, dropBottom].forEach(zone => zone.classList.remove('over'));
-      [topLabelTarget, bottomLabelTarget, type3SideLabelTarget].forEach(el => el.classList.remove('over'));
-      if(dragState.kind === 'block'){
-        const zone = rowAtPoint(x, y);
-        if(zone) zone.classList.add('over');
-      } else {
-        const target = labelTargetAtPoint(x, y);
-        if(target) target.el.classList.add('over');
-      }
-    }
-
-    function endDrag(x, y){
-      if(!dragState) return;
-      [dropTop, dropBottom].forEach(zone => zone.classList.remove('over'));
-      [topLabelTarget, bottomLabelTarget, type3SideLabelTarget].forEach(el => el.classList.remove('over'));
-      if(dragState.kind === 'block'){
-        const zone = rowAtPoint(x, y);
-        if(zone) addUnitToRow(zone.dataset.row);
-      } else {
-        const target = labelTargetAtPoint(x, y);
-        if(target && target.key === dragState.tag){
-          labelState[target.key] = true;
-          renderLabelTargets();
-          resetMarkers();
-          setFeedback('Nice. You placed a label on the model.', 'neutral');
-        }
-      }
-      dragState.ghost.remove();
-      dragState = null;
-    }
-
-    document.getElementById('paletteUnit').addEventListener('pointerdown', (e) => {
-      if(solved) return;
-      e.preventDefault();
-      dragState = { kind:'block', ghost: createGhost(e.clientX, e.clientY) };
-    });
-
-    [topValueTag, bottomValueTag].forEach(tagEl => {
-      tagEl.addEventListener('pointerdown', (e) => {
-        if(solved) return;
-        e.preventDefault();
-        dragState = { kind:'tag', tag:tagEl.dataset.tag, ghost:createTagGhost(tagEl.textContent.trim(), e.clientX, e.clientY) };
-      });
-    });
-
-    document.addEventListener('pointermove', (e) => {
-      if(!dragState) return;
-      e.preventDefault();
-      moveGhost(e.clientX, e.clientY);
-    }, { passive:false });
-
-    document.addEventListener('pointerup', (e) => {
-      if(!dragState) return;
-      e.preventDefault();
-      endDrag(e.clientX, e.clientY);
-    }, { passive:false });
-
-    document.getElementById('modelArea').addEventListener('click', (e) => {
-      const unit = e.target.closest('.model-unit');
-      if(!unit || solved) return;
-      const row = unit.dataset.row;
-      modelState[row] = Math.max(0, modelState[row] - 1);
-      renderModel();
-      resetMarkers();
-      setFeedback('One unit removed. Keep adjusting your model.', 'neutral');
-    });
-
-    topLabelTarget.addEventListener('click', () => {
-      if(solved || !labelState.top) return;
-      labelState.top = false;
-      renderLabelTargets();
-      resetMarkers();
-      setFeedback('Top label removed. Place it again if needed.', 'neutral');
-    });
-
-    bottomLabelTarget.addEventListener('click', () => {
-      if(solved || !labelState.bottom) return;
-      labelState.bottom = false;
-      renderLabelTargets();
-      resetMarkers();
-      setFeedback('Bottom label removed. Place it again if needed.', 'neutral');
-    });
-
-    type3SideLabelTarget.addEventListener('click', () => {
-      const q = currentQuestion();
-      if(!q || (q.type !== 1 && q.type !== 2 && q.type !== 3) || solved || !labelState.bottom) return;
-      labelState.bottom = false;
-      renderLabelTargets();
-      resetMarkers();
-      setFeedback('Total label removed. Place it again if needed.', 'neutral');
-    });
-
-    document.getElementById('clearModelBtn').addEventListener('click', clearModel);
-    document.getElementById('clearAllBtn').addEventListener('click', clearBlanks);
-    document.getElementById('checkBtn').addEventListener('click', checkQuestion);
-    nextBtn.addEventListener('click', nextQuestion);
-
-    if(workingCanvas){
-      workingCanvas.addEventListener('pointerdown', (e) => {
-        workingCanvas.setPointerCapture?.(e.pointerId);
-        startWorkingDraw(e);
-      });
-      workingCanvas.addEventListener('pointermove', moveWorkingDraw);
-      workingCanvas.addEventListener('pointerup', stopWorkingDraw);
-      workingCanvas.addEventListener('pointercancel', stopWorkingDraw);
-    }
-
-    if(clearWorkingBtn){
-      clearWorkingBtn.addEventListener('click', clearWorking);
-    }
-
-
-    modeButtons.forEach(btn => {
-      btn.addEventListener('click', () => startMode(btn.dataset.mode, true, false));
-    });
-
-    document.getElementById('restartBtn').addEventListener('click', () => startMode(currentMode, true, false));
-    document.getElementById('backMixedBtn').addEventListener('click', () => startMode('mixed', true, false));
-    document.getElementById('rewardPlayAgain').addEventListener('click', startJourney);
-    document.getElementById('rewardBackMixed').addEventListener('click', () => startMode('mixed', true, false));
-
-    const fitStage = document.getElementById('fitStage');
-    const page = document.querySelector('.page');
-    let fitStageLocked = false;
-
-    function applyViewportFit(){
-      if(!fitStage || !page) return;
-      fitStage.style.transform = 'scale(1)';
-      const baseWidth = page.offsetWidth;
-      const baseHeight = page.offsetHeight;
-      const vw = window.innerWidth;
-      const vh = window.innerHeight;
-      const scale = Math.min(vw / baseWidth, vh / baseHeight);
-      fitStage.style.width = `${baseWidth}px`;
-      fitStage.style.height = `${baseHeight}px`;
-      fitStage.style.transform = `scale(${scale})`;
-    }
-
-    function requestViewportFit(){
-      if(fitStageLocked) return;
-      fitStageLocked = true;
-      requestAnimationFrame(() => {
-        fitStageLocked = false;
-        applyViewportFit();
-        setupWorkingCanvas();
-        renderType3PartWhole();
-        positionAsManyLabels();
-      });
-    }
-
-    window.addEventListener('resize', requestViewportFit);
-    window.addEventListener('orientationchange', requestViewportFit);
-    if(window.visualViewport){
-      window.visualViewport.addEventListener('resize', requestViewportFit);
-    }
-
-    const fitObserver = new MutationObserver(requestViewportFit);
-    fitObserver.observe(page, { childList:true, subtree:true, characterData:true, attributes:true });
-
-    buildPlaceRows();
-    startJourney();
-    setupWorkingCanvas(true);
-    requestViewportFit();
-    window.addEventListener('load', requestViewportFit);
-    if(document.fonts && document.fonts.ready){
-      document.fonts.ready.then(() => {
-        requestViewportFit();
-        setTimeout(requestViewportFit, 60);
-      });
-    }
-    setTimeout(requestViewportFit, 120);
-  </script>
+    currentIndex+=1;
+    renderQuestion();
+    return;
+  }
+  if(currentIndex>=queue.length-1){showEndScreen();return}
+  currentIndex+=1;renderQuestion()
+}
+function addUnit(){const q=currentQuestion();if(solved)return;const maxUnits=q.type===1?q.groupUnits:q.totalUnits;if(modelUnits>=maxUnits)return;modelUnits+=1;renderModel();resetMarkers();setFeedback('Nice. Keep building the model.','neutral')}
+function removeLastUnit(){if(solved||modelUnits<=0)return;modelUnits-=1;renderModel();resetMarkers();setFeedback('One unit removed.','neutral')}
+function toNumber(id){const el=document.getElementById(id);if(!el)return NaN;const val=el.value.trim();return val===''?NaN:Number(val)}
+function markInput(id,ok){const el=document.getElementById(id);if(!el)return;el.classList.remove('wrong','right');el.classList.add(ok?'right':'wrong')}
+function checkQuestion(){const q=currentQuestion();resetMarkers();const expectedUnits=q.type===1?q.groupUnits:q.totalUnits;const modelCorrect=modelUnits===expectedUnits;barZone.classList.add(modelCorrect?'right':'wrong');let labelsCorrect=false;if(q.type===1){labelsCorrect=labelsPlaced.fixed&&labelsPlaced.total&&labelsPlaced.unknown;fixedTarget.classList.add(labelsPlaced.fixed?'right':'wrong')}else{labelsCorrect=labelsPlaced.total&&labelsPlaced.unknown}unknownTarget.classList.add(labelsPlaced.unknown?'right':'wrong');totalTarget.classList.add(labelsPlaced.total?'right':'wrong');let blanksCorrect=true;if(q.type===1){const checks={eq_subtract:toNumber('eq_subtract')===q.fixedAmount,eq_remaining:toNumber('eq_remaining')===q.remainingTotal,eq_dividend:toNumber('eq_dividend')===q.remainingTotal,eq_divisor:toNumber('eq_divisor')===q.groupUnits,eq_each:toNumber('eq_each')===q.answer,eq_final:toNumber('eq_final')===q.answer};Object.entries(checks).forEach(([id,ok])=>{markInput(id,ok);if(!ok)blanksCorrect=false})}else{const a=toNumber('eq_mul_a'),b=toNumber('eq_mul_b');const multOk=(a===q.oneUnit&&b===q.askedUnits)||(a===q.askedUnits&&b===q.oneUnit);const checks={eq_divisor:toNumber('eq_divisor')===q.totalUnits,eq_oneunit:toNumber('eq_oneunit')===q.oneUnit,eq_mul_a:multOk&&!Number.isNaN(a),eq_mul_b:multOk&&!Number.isNaN(b),eq_part:toNumber('eq_part')===q.answer,eq_final:toNumber('eq_final')===q.answer};Object.entries(checks).forEach(([id,ok])=>{markInput(id,ok);if(!ok)blanksCorrect=false})}if(modelCorrect&&labelsCorrect&&blanksCorrect){if(!solved){score+=1;solved=true}updatePills();celebrate.classList.add('show');setFeedback('Excellent! Your model and equations are correct.','good');nextBtn.disabled=false;if(isJourneyMode){nextBtn.textContent=(currentIndex===queue.length-1)?(currentMode===JOURNEY_ORDER[JOURNEY_ORDER.length-1]?'See Reward':'Continue Journey'):'Next Question'}else{nextBtn.textContent=currentIndex===queue.length-1?'See Results':'Next Question'}return}celebrate.classList.remove('show');nextBtn.disabled=true;if(!modelCorrect&&!labelsCorrect)setFeedback('Check the number of units and the model labels.','bad');else if(!modelCorrect)setFeedback(`Your model should show ${expectedUnits} unit(s).`,'bad');else if(!labelsCorrect)setFeedback('Your model is close. Check the labels on the braces.','bad');else setFeedback('Your model looks good. Now check the numbers in the equation blanks.','bad')}
+function rowAtPoint(x,y){const rect=barZone.getBoundingClientRect();return x>=rect.left&&x<=rect.right&&y>=rect.top&&y<=rect.bottom?barZone:null}
+function targetAtPoint(x,y){const q=currentQuestion();const targets=[];if(q.type===1)targets.push({el:fixedTarget,key:'fixed'});targets.push({el:unknownTarget,key:'unknown'},{el:totalTarget,key:'total'});for(const t of targets){if(!t.el.classList.contains('show'))continue;const r=t.el.getBoundingClientRect();if(x>=r.left&&x<=r.right&&y>=r.top&&y<=r.bottom)return t}return null}
+function moveGhost(x,y){if(!dragState)return;dragState.ghost.style.left=`${x}px`;dragState.ghost.style.top=`${y}px`;barZone.classList.remove('over');[fixedTarget,unknownTarget,totalTarget].forEach(el=>el.classList.remove('over'));if(dragState.kind==='unit'){if(rowAtPoint(x,y))barZone.classList.add('over')}else{const target=targetAtPoint(x,y);if(target)target.el.classList.add('over')}}
+function endDrag(x,y){if(!dragState)return;barZone.classList.remove('over');[fixedTarget,unknownTarget,totalTarget].forEach(el=>el.classList.remove('over'));if(dragState.kind==='unit'){if(rowAtPoint(x,y))addUnit()}else{const target=targetAtPoint(x,y);if(target&&target.key===dragState.key){labelsPlaced[target.key]=true;fillTargets();resetMarkers();setFeedback('Nice. You placed a label on the model.','neutral')}}dragState.ghost.remove();dragState=null}
+document.getElementById('paletteUnit').addEventListener('pointerdown',e=>{if(solved)return;e.preventDefault();dragState={kind:'unit',ghost:createGhost(e.clientX,e.clientY)}});
+document.addEventListener('pointermove',e=>{if(!dragState)return;e.preventDefault();moveGhost(e.clientX,e.clientY)},{passive:false});
+document.addEventListener('pointerup',e=>{if(!dragState)return;e.preventDefault();endDrag(e.clientX,e.clientY)},{passive:false});
+barTrack.addEventListener('click',e=>{if(solved)return;const slot=e.target.closest('.slot');if(!slot)return;const q=currentQuestion();const slots=Array.from(barTrack.children);const index=slots.indexOf(slot);if(q.type===1){if(index>0&&index<=modelUnits)removeLastUnit()}else if(index>=0&&index<modelUnits)removeLastUnit()});
+fixedTarget.addEventListener('click',()=>{if(solved||!labelsPlaced.fixed)return;labelsPlaced.fixed=false;fillTargets();resetMarkers()});
+unknownTarget.addEventListener('click',()=>{if(solved||!labelsPlaced.unknown)return;labelsPlaced.unknown=false;fillTargets();resetMarkers()});
+totalTarget.addEventListener('click',()=>{if(solved||!labelsPlaced.total)return;labelsPlaced.total=false;fillTargets();resetMarkers()});
+document.getElementById('clearModelBtn').addEventListener('click',clearModel);
+document.getElementById('clearBlanksBtn').addEventListener('click',clearBlanks);
+document.getElementById('checkBtn').addEventListener('click',checkQuestion);
+nextBtn.addEventListener('click',nextQuestion);
+modeButtons.forEach(btn=>btn.addEventListener('click',()=>startMode(btn.dataset.mode,true,false)));
+document.getElementById('restartBtn').addEventListener('click',()=>startMode(currentMode,true,false));
+document.getElementById('backMixedBtn').addEventListener('click',()=>startMode('mixed',true,false));
+document.getElementById('rewardPlayAgain').addEventListener('click',startJourney);
+document.getElementById('rewardBackMixed').addEventListener('click',()=>startMode('mixed',true,false));
+
+const workArea=document.getElementById('workArea'),workingCanvas=document.getElementById('workingCanvas');let workingCtx=null,workingDrawing=false,workingLastPoint=null,workingCurrentStroke=null,workingStrokes=[],lastWorkAreaSize={width:0,height:0};function setupWorkingCanvas(forceRedraw=false){if(!workingCanvas||!workArea)return;const width=workArea.clientWidth,height=workArea.clientHeight;if(!width||!height)return;const sizeChanged=width!==lastWorkAreaSize.width||height!==lastWorkAreaSize.height;if(!forceRedraw&&!sizeChanged&&workingCtx)return;const ratio=window.devicePixelRatio||1;workingCanvas.width=Math.round(width*ratio);workingCanvas.height=Math.round(height*ratio);workingCanvas.style.width=`${width}px`;workingCanvas.style.height=`${height}px`;workingCtx=workingCanvas.getContext('2d');workingCtx.setTransform(ratio,0,0,ratio,0,0);workingCtx.lineCap='round';workingCtx.lineJoin='round';workingCtx.lineWidth=3.5;workingCtx.strokeStyle='#4d6270';workingCtx.imageSmoothingEnabled=false;lastWorkAreaSize={width,height};redrawWorking()}function getWorkingPoint(e){const rect=workingCanvas.getBoundingClientRect(),cssW=parseFloat(workingCanvas.style.width)||workingCanvas.clientWidth||rect.width||1,cssH=parseFloat(workingCanvas.style.height)||workingCanvas.clientHeight||rect.height||1,rawX=Math.max(0,Math.min(rect.width,e.clientX-rect.left)),rawY=Math.max(0,Math.min(rect.height,e.clientY-rect.top)),x=rect.width?(rawX*cssW/rect.width):rawX,y=rect.height?(rawY*cssH/rect.height):rawY;return{x,y,nx:cssW?x/cssW:0,ny:cssH?y/cssH:0}}function redrawWorking(){if(!workingCtx)return;const w=parseFloat(workingCanvas.style.width)||0,h=parseFloat(workingCanvas.style.height)||0;workingCtx.clearRect(0,0,w,h);for(const stroke of workingStrokes){if(!stroke.points||!stroke.points.length)continue;workingCtx.beginPath();const first=stroke.points[0];workingCtx.moveTo(first.x*w,first.y*h);for(let i=1;i<stroke.points.length;i++){const pt=stroke.points[i];workingCtx.lineTo(pt.x*w,pt.y*h)}if(stroke.points.length===1)workingCtx.lineTo(first.x*w+.01,first.y*h+.01);workingCtx.stroke()}}function startWorkingDraw(e){setupWorkingCanvas();if(!workingCtx)return;e.preventDefault();workingDrawing=true;workingLastPoint=getWorkingPoint(e);workingCurrentStroke={points:[{x:workingLastPoint.nx,y:workingLastPoint.ny}]};workingStrokes.push(workingCurrentStroke);workingCtx.beginPath();workingCtx.moveTo(workingLastPoint.x,workingLastPoint.y);workingCtx.lineTo(workingLastPoint.x+.01,workingLastPoint.y+.01);workingCtx.stroke()}function moveWorkingDraw(e){if(!workingDrawing||!workingCtx||!workingCurrentStroke)return;e.preventDefault();const pt=getWorkingPoint(e);workingCtx.beginPath();workingCtx.moveTo(workingLastPoint.x,workingLastPoint.y);workingCtx.lineTo(pt.x,pt.y);workingCtx.stroke();workingCurrentStroke.points.push({x:pt.nx,y:pt.ny});workingLastPoint=pt}function stopWorkingDraw(e){if(e&&workingCanvas?.hasPointerCapture?.(e.pointerId))workingCanvas.releasePointerCapture(e.pointerId);workingDrawing=false;workingLastPoint=null;workingCurrentStroke=null}function clearWorking(){workingStrokes=[];if(!workingCtx)return;const w=parseFloat(workingCanvas.style.width)||0,h=parseFloat(workingCanvas.style.height)||0;workingCtx.clearRect(0,0,w,h)}if(workingCanvas){workingCanvas.addEventListener('pointerdown',e=>{workingCanvas.setPointerCapture?.(e.pointerId);startWorkingDraw(e)});workingCanvas.addEventListener('pointermove',moveWorkingDraw);workingCanvas.addEventListener('pointerup',stopWorkingDraw);workingCanvas.addEventListener('pointercancel',stopWorkingDraw);workingCanvas.addEventListener('pointerleave',stopWorkingDraw)}document.getElementById('clearWorkingBtn').addEventListener('click',clearWorking);
+const fitStage=document.getElementById('fitStage'),page=document.querySelector('.page');let fitStageLocked=false;function applyViewportFit(){if(!fitStage||!page)return;fitStage.style.transform='scale(1)';const baseWidth=page.offsetWidth,baseHeight=page.offsetHeight,vw=window.innerWidth,vh=window.innerHeight,scale=Math.min(vw/baseWidth,vh/baseHeight);fitStage.style.width=`${baseWidth}px`;fitStage.style.height=`${baseHeight}px`;fitStage.style.transform=`scale(${scale})`}function requestViewportFit(){if(fitStageLocked)return;fitStageLocked=true;requestAnimationFrame(()=>{fitStageLocked=false;applyViewportFit();setupWorkingCanvas(true)})}window.addEventListener('resize',requestViewportFit);window.addEventListener('orientationchange',requestViewportFit);if(window.visualViewport)window.visualViewport.addEventListener('resize',requestViewportFit);const fitObserver=new MutationObserver(requestViewportFit);fitObserver.observe(page,{childList:true,subtree:true,characterData:true,attributes:true});buildPlaceRows();startJourney();requestViewportFit();window.addEventListener('load',requestViewportFit);if(document.fonts&&document.fonts.ready){document.fonts.ready.then(()=>{requestViewportFit();setTimeout(requestViewportFit,60)})}setTimeout(requestViewportFit,120);
+</script>
 </body>
 </html>
