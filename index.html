@@ -47,7 +47,7 @@
   </div>
   <div class="mission-bar"><div class="mission-fill" id="missionFill"></div></div>
   <div class="mission-bottom">
-    <div class="streak-text" id="streakText">Progress streak: 0 of 6</div>
+    <div class="streak-text" id="streakText">Progress streak: 0 of 2</div>
     <div class="streak-stars">
       <div class="streak-star" id="streak1">⭐</div>
       <div class="streak-star" id="streak2">⭐</div>
@@ -103,12 +103,18 @@ function playSound(name){
 const typeBadge=document.getElementById('typeBadge');const questionText=document.getElementById('questionText');const miniNote=document.getElementById('miniNote');const rowTopLabel=document.getElementById('rowTopLabel');const rowBottomLabel=document.getElementById('rowBottomLabel');const topRow=document.getElementById('topRow');const bottomRow=document.getElementById('bottomRow');const barZone=document.getElementById('barZone');const barTrack=document.getElementById('barTrack');const fixedTarget=document.getElementById('fixedTarget');const unknownTarget=document.getElementById('unknownTarget');const totalTarget=document.getElementById('totalTarget');const topLeftBrace=document.getElementById('topLeftBrace');const topRightBrace=document.getElementById('topRightBrace');const bottomWholeBrace=document.getElementById('bottomWholeBrace');const labelTools=document.getElementById('labelTools');const labelToolHelp=document.getElementById('labelToolHelp');const equationHolder=document.getElementById('equationHolder');const feedback=document.getElementById('feedback');const celebrate=document.getElementById('celebrate');const nextBtn=document.getElementById('nextBtn');const progressPill=document.getElementById('progressPill');const scorePill=document.getElementById('scorePill');const modePill=document.getElementById('modePill');const endScreen=document.getElementById('endScreen');const endText=document.getElementById('endText');const gameGrid=document.getElementById('gameGrid');
 function shuffle(arr){const copy=[...arr];for(let i=copy.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[copy[i],copy[j]]=[copy[j],copy[i]]}return copy}
 function getModeQuestions(mode){
-  if(mode==='mixed'){
-    const t1=shuffle(QUESTION_BANK.type1).slice(0,3);
-    const t2=shuffle(QUESTION_BANK.type2).slice(0,3);
-    return shuffle([...t1,...t2]).slice(0,GAME_TARGET);
+  if(mode==='type1'){
+    return shuffle(QUESTION_BANK.type1).slice(0,2);
   }
-  return shuffle(QUESTION_BANK[mode]).slice(0, Math.min(GAME_TARGET, QUESTION_BANK[mode].length));
+  if(mode==='type2'){
+    return shuffle(QUESTION_BANK.type2).slice(0,2);
+  }
+  if(mode==='mixed'){
+    const t1=shuffle(QUESTION_BANK.type1).slice(0,1);
+    const t2=shuffle(QUESTION_BANK.type2).slice(0,1);
+    return shuffle([...t1,...t2]);
+  }
+  return shuffle(QUESTION_BANK[mode]||[]);
 }
 function currentQuestion(){return queue[currentIndex]}
 function buildPlaceRows(count=9){const placeRows=document.getElementById('placeRows');if(!placeRows)return;placeRows.innerHTML=Array.from({length:count},()=>'<div class="place-row"><div class="place-line"></div></div>').join('')}
