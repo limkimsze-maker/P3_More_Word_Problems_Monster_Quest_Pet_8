@@ -642,7 +642,6 @@ const JOURNEY_TARGET=6;
 const JOURNEY_ORDER=['type1','type2','mixed'];
 
 let currentMode='type1',queue=[],currentIndex=0,score=0,solved=false,modelUnits=0,dragState=null,labelsPlaced={fixed:false,unknown:false,total:false};
-let paletteUnitTap=null;
 let isJourneyMode=true;
 let journeyQueues=null;
 let modeProgress={type1:0,type2:0,mixed:0};
@@ -806,45 +805,13 @@ function removeLastUnit(){if(solved||modelUnits<=0)return;modelUnits-=1;renderMo
 function toNumber(id){const el=document.getElementById(id);if(!el)return NaN;const val=el.value.trim();return val===''?NaN:Number(val)}
 function markInput(id,ok){const el=document.getElementById(id);if(!el)return;el.classList.remove('wrong','right');el.classList.add(ok?'right':'wrong')}
 function checkQuestion(){const q=currentQuestion();resetMarkers();const expectedUnits=q.type===1?q.groupUnits:q.totalUnits;const modelCorrect=modelUnits===expectedUnits;barZone.classList.add(modelCorrect?'right':'wrong');let labelsCorrect=false;if(q.type===1){labelsCorrect=labelsPlaced.fixed&&labelsPlaced.total&&labelsPlaced.unknown;fixedTarget.classList.add(labelsPlaced.fixed?'right':'wrong')}else{labelsCorrect=labelsPlaced.total&&labelsPlaced.unknown}unknownTarget.classList.add(labelsPlaced.unknown?'right':'wrong');totalTarget.classList.add(labelsPlaced.total?'right':'wrong');let blanksCorrect=true;if(q.type===1){const checks={eq_subtract:toNumber('eq_subtract')===q.fixedAmount,eq_remaining:toNumber('eq_remaining')===q.remainingTotal,eq_dividend:toNumber('eq_dividend')===q.remainingTotal,eq_divisor:toNumber('eq_divisor')===q.groupUnits,eq_each:toNumber('eq_each')===q.answer,eq_final:toNumber('eq_final')===q.answer};Object.entries(checks).forEach(([id,ok])=>{markInput(id,ok);if(!ok)blanksCorrect=false})}else{const a=toNumber('eq_mul_a'),b=toNumber('eq_mul_b');const multOk=(a===q.oneUnit&&b===q.askedUnits)||(a===q.askedUnits&&b===q.oneUnit);const checks={eq_divisor:toNumber('eq_divisor')===q.totalUnits,eq_oneunit:toNumber('eq_oneunit')===q.oneUnit,eq_mul_a:multOk&&!Number.isNaN(a),eq_mul_b:multOk&&!Number.isNaN(b),eq_part:toNumber('eq_part')===q.answer,eq_final:toNumber('eq_final')===q.answer};Object.entries(checks).forEach(([id,ok])=>{markInput(id,ok);if(!ok)blanksCorrect=false})}if(modelCorrect&&labelsCorrect&&blanksCorrect){if(!solved){score+=1;solved=true}playSound('ok');updatePills();celebrate.classList.add('show');setFeedback('Excellent! Your model and equations are correct.','good');nextBtn.disabled=false;if(isJourneyMode){nextBtn.textContent=(currentIndex===queue.length-1)?(currentMode===JOURNEY_ORDER[JOURNEY_ORDER.length-1]?'See Reward':'Continue Journey'):'Next Question'}else{nextBtn.textContent=currentIndex===queue.length-1?'See Results':'Next Question'}return}playSound('bad');celebrate.classList.remove('show');nextBtn.disabled=true;if(!modelCorrect&&!labelsCorrect)setFeedback('Check the number of units and the model labels.','bad');else if(!modelCorrect)setFeedback(`Your model should show ${expectedUnits} unit(s).`,'bad');else if(!labelsCorrect)setFeedback('Your model is close. Check the labels on the braces.','bad');else setFeedback('Your model looks good. Now check the numbers in the equation blanks.','bad')}
-function pointHitsRect(x,y,rect,padX=0,padY=0){return x>=rect.left-padX&&x<=rect.right+padX&&y>=rect.top-padY&&y<=rect.bottom+padY}
-function rowAtPoint(x,y){
-  const zoneRect=barZone.getBoundingClientRect();
-  const stageRect=barStage.getBoundingClientRect();
-  const hitRect={
-    left:Math.min(zoneRect.left,stageRect.left)+6,
-    right:Math.max(zoneRect.right,stageRect.right)-6,
-    top:Math.min(zoneRect.top,stageRect.top)+18,
-    bottom:Math.max(zoneRect.bottom,stageRect.bottom)-6
-  };
-  return pointHitsRect(x,y,hitRect,28,26)?barZone:null
-}
-function targetAtPoint(x,y){const q=currentQuestion();const targets=[];if(q.type===1)targets.push({el:fixedTarget,key:'fixed'});targets.push({el:unknownTarget,key:'unknown'},{el:totalTarget,key:'total'});for(const t of targets){if(!t.el.classList.contains('show'))continue;const r=t.el.getBoundingClientRect();if(pointHitsRect(x,y,r,10,10))return t}return null}
+function rowAtPoint(x,y){const rect=barZone.getBoundingClientRect();return x>=rect.left&&x<=rect.right&&y>=rect.top&&y<=rect.bottom?barZone:null}
+function targetAtPoint(x,y){const q=currentQuestion();const targets=[];if(q.type===1)targets.push({el:fixedTarget,key:'fixed'});targets.push({el:unknownTarget,key:'unknown'},{el:totalTarget,key:'total'});for(const t of targets){if(!t.el.classList.contains('show'))continue;const r=t.el.getBoundingClientRect();if(x>=r.left&&x<=r.right&&y>=r.top&&y<=r.bottom)return t}return null}
 function moveGhost(x,y){if(!dragState)return;dragState.ghost.style.left=`${x}px`;dragState.ghost.style.top=`${y}px`;barZone.classList.remove('over');[fixedTarget,unknownTarget,totalTarget].forEach(el=>el.classList.remove('over'));if(dragState.kind==='unit'){if(rowAtPoint(x,y))barZone.classList.add('over')}else{const target=targetAtPoint(x,y);if(target)target.el.classList.add('over')}}
-function endDrag(x,y,opts={}){if(!dragState)return;barZone.classList.remove('over');[fixedTarget,unknownTarget,totalTarget].forEach(el=>el.classList.remove('over'));if(dragState.kind==='unit'){if(rowAtPoint(x,y)||opts.tapAdd)addUnit()}else{const target=targetAtPoint(x,y);if(target&&target.key===dragState.key){labelsPlaced[target.key]=true;fillTargets();resetMarkers();setFeedback('Nice. You placed a label on the model.','neutral')}}dragState.ghost.remove();dragState=null}
-const paletteUnitEl=document.getElementById('paletteUnit');
-paletteUnitEl.addEventListener('pointerdown',e=>{
-  if(solved)return;
-  e.preventDefault();
-  paletteUnitTap={pointerId:e.pointerId,startX:e.clientX,startY:e.clientY,moved:false};
-  dragState={kind:'unit',ghost:createGhost(e.clientX,e.clientY)};
-});
-document.addEventListener('pointermove',e=>{
-  if(paletteUnitTap&&e.pointerId===paletteUnitTap.pointerId){
-    const dx=e.clientX-paletteUnitTap.startX,dy=e.clientY-paletteUnitTap.startY;
-    if(Math.hypot(dx,dy)>12)paletteUnitTap.moved=true;
-  }
-  if(!dragState)return;
-  e.preventDefault();
-  moveGhost(e.clientX,e.clientY)
-},{passive:false});
-document.addEventListener('pointerup',e=>{
-  if(!dragState)return;
-  e.preventDefault();
-  const tapAdd=!!(dragState.kind==='unit'&&paletteUnitTap&&e.pointerId===paletteUnitTap.pointerId&&!paletteUnitTap.moved);
-  endDrag(e.clientX,e.clientY,{tapAdd});
-  paletteUnitTap=null;
-},{passive:false});
-document.addEventListener('pointercancel',()=>{if(dragState){dragState.ghost.remove();dragState=null}paletteUnitTap=null});
+function endDrag(x,y){if(!dragState)return;barZone.classList.remove('over');[fixedTarget,unknownTarget,totalTarget].forEach(el=>el.classList.remove('over'));if(dragState.kind==='unit'){if(rowAtPoint(x,y))addUnit()}else{const target=targetAtPoint(x,y);if(target&&target.key===dragState.key){labelsPlaced[target.key]=true;fillTargets();resetMarkers();setFeedback('Nice. You placed a label on the model.','neutral')}}dragState.ghost.remove();dragState=null}
+document.getElementById('paletteUnit').addEventListener('pointerdown',e=>{if(solved)return;e.preventDefault();dragState={kind:'unit',ghost:createGhost(e.clientX,e.clientY)}});
+document.addEventListener('pointermove',e=>{if(!dragState)return;e.preventDefault();moveGhost(e.clientX,e.clientY)},{passive:false});
+document.addEventListener('pointerup',e=>{if(!dragState)return;e.preventDefault();endDrag(e.clientX,e.clientY)},{passive:false});
 barTrack.addEventListener('click',e=>{if(solved)return;const slot=e.target.closest('.slot');if(!slot)return;const q=currentQuestion();const slots=Array.from(barTrack.children);const index=slots.indexOf(slot);if(q.type===1){if(index>0&&index<=modelUnits)removeLastUnit()}else if(index>=0&&index<modelUnits)removeLastUnit()});
 fixedTarget.addEventListener('click',()=>{if(solved||!labelsPlaced.fixed)return;labelsPlaced.fixed=false;fillTargets();resetMarkers()});
 unknownTarget.addEventListener('click',()=>{if(solved||!labelsPlaced.unknown)return;labelsPlaced.unknown=false;fillTargets();resetMarkers()});
