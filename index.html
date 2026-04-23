@@ -7,7 +7,7 @@
   <style>
     :root{--bg:#f6fbf1;--card:#ffffff;--ink:#203225;--soft:#5d755f;--green:#9bd56e;--green-dark:#3f7d2a;--mint:#dff4df;--blue:#cfe9ff;--blue-deep:#7eb7e6;--pink:#ffd7d7;--pink-deep:#e69494;--gold:#ffe589;--line:#cfe5c4;--danger:#d85c5c;--ok:#2a9d55;--shadow:0 10px 28px rgba(50,90,50,.10);--unit-w:68px;--unit-h:40px;--radius:18px;--font:"Comic Sans MS","Comic Sans","Trebuchet MS",sans-serif}
     *{box-sizing:border-box}html,body{width:100%;height:100%;margin:0;padding:0;overflow:hidden;background:linear-gradient(180deg,#f4fbef 0%, #edf8ee 100%);color:var(--ink);font-family:var(--font)}body{position:fixed;inset:0;overscroll-behavior:none;touch-action:manipulation}.fit-viewport{position:fixed;inset:0;overflow:hidden;display:flex;justify-content:center;align-items:flex-start;padding-top:2px;background:linear-gradient(180deg,#f4fbef 0%, #edf8ee 100%)}.fit-stage{position:relative;transform-origin:top center;will-change:transform;width:100%}.page{width:calc(100vw - 8px);max-width:none;margin:0 auto;padding:8px 4px 12px}.hero,.card{background:var(--card);border:3px solid var(--line);border-radius:24px;box-shadow:var(--shadow)}.hero{padding:18px;margin-bottom:14px}.hero-top{display:flex;gap:14px;align-items:center;justify-content:space-between;flex-wrap:wrap}.title-wrap h1{margin:0;font-size:clamp(28px,4vw,42px);line-height:1.05;color:var(--green-dark)}.title-wrap p{margin:8px 0 0;font-size:16px;color:var(--soft)}.scoreboard{display:flex;gap:10px;flex-wrap:wrap}.pill{background:#eef8e9;color:var(--green-dark);border:2px solid #cfe5c4;border-radius:999px;padding:10px 14px;font-weight:700;min-width:120px;text-align:center;font-size:16px}.mode-bar{margin-top:14px;display:flex;gap:10px;flex-wrap:wrap}.mode-btn{appearance:none;border:none;background:#e6f4de;color:var(--green-dark);padding:12px 16px;border-radius:14px;font:700 16px var(--font);cursor:pointer;border:2px solid #c9e0bc;box-shadow:0 4px 0 rgba(90,135,75,.12)}    .mode-btn.active{background:var(--green);border-color:#84bf59;transform:translateY(1px)}
-    .mode-bar .mode-btn[data-mode="mixed"]{order:99}
+    
     .mission-card{margin:0 0 14px;background:#f7fbff;border:2px solid #cfe2f7;border-radius:20px;padding:12px 14px;box-shadow:0 8px 18px rgba(50,90,50,.06);display:grid;gap:8px}
     .mission-top{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
     .mission-title{font-size:18px;font-weight:700;color:#275777}
@@ -562,11 +562,21 @@
   .place-grid > .place-vert:nth-of-type(5){ left: calc(var(--hto-left) + 168px) !important; }
 </style>
 
+
+<style id="journey_lock_patch">
+  .mode-btn:disabled,
+  .mode-btn.locked{
+    opacity:.55 !important;
+    cursor:not-allowed !important;
+    filter:saturate(.7);
+  }
+</style>
+
 </head>
 <body>
 
 <div class="fit-viewport" id="fitViewport"><div class="fit-stage" id="fitStage"><div class="page">
-<section class="hero"><div class="hero-top"><div class="title-wrap"><h1>Word Problems (2 Types Mixed)</h1><p>Build the model, place the labels, then fill in the equation blanks.</p></div><div class="scoreboard"><div class="pill" id="modePill">Mode: Mixed</div><div class="pill" id="progressPill">Question 1 / 6</div><div class="pill" id="scorePill">Score: 0</div></div></div><div class="mode-bar"><button class="mode-btn active" data-mode="mixed">Mixed Practice</button><button class="mode-btn" data-mode="type1">Type 1</button><button class="mode-btn" data-mode="type2">Type 2</button></div></section>
+<section class="hero"><div class="hero-top"><div class="title-wrap"><h1>Word Problems (2 Types Mixed)</h1><p>Build the model, place the labels, then fill in the equation blanks.</p></div><div class="scoreboard"><div class="pill" id="modePill">Mode: Mixed</div><div class="pill" id="progressPill">Question 1 / 6</div><div class="pill" id="scorePill">Score: 0</div></div></div><div class="mode-bar"><button class="mode-btn active" data-mode="type1">Type 1</button><button class="mode-btn" data-mode="type2">Type 2</button><button class="mode-btn" data-mode="mixed">Mixed Practice</button></div></section>
 <div class="mission-card" id="missionCard">
   <div class="mission-top">
     <div class="mission-title" id="missionTitle">Game Journey — Type 1</div>
@@ -736,14 +746,26 @@ function buildPlaceRows(count=9){const placeRows=document.getElementById('placeR
 function getLabelConfig(q){return q.type===1?[{key:'fixed',text:String(q.fixedAmount)},{key:'total',text:String(q.total)},{key:'unknown',text:'?'}]:[{key:'total',text:String(q.total)},{key:'unknown',text:'?'}]}
 function setLabelToolbox(q){labelTools.innerHTML='';getLabelConfig(q).forEach(item=>{const tag=document.createElement('div');tag.className='palette-tag';tag.textContent=item.text;tag.dataset.key=item.key;labelTools.appendChild(tag);tag.addEventListener('pointerdown',e=>{if(solved)return;e.preventDefault();dragState={kind:'tag',key:item.key,text:item.text,ghost:createTagGhost(item.text,e.clientX,e.clientY)}})});labelToolHelp.textContent=q.type===1?'Drag the used amount, the total amount, and the ? 1-unit label onto the correct braces.':'Drag the total amount and the ? label onto the correct braces.'}
 function getJourneyQuestionNumber(){const idx=JOURNEY_ORDER.indexOf(currentMode);return idx<0?currentIndex+1:(idx*2)+currentIndex+1}
+function isJourneyModeUnlocked(mode){
+  if(!isJourneyMode) return true;
+  if(mode==='type1') return true;
+  const type1Done=(modeProgress.type1||0) >= ((journeyQueues?.type1?.length) || MODE_TARGETS.type1 || 0);
+  const type2Done=(modeProgress.type2||0) >= ((journeyQueues?.type2?.length) || MODE_TARGETS.type2 || 0);
+  if(mode==='type2') return type1Done;
+  if(mode==='mixed') return type1Done && type2Done;
+  return true;
+}
 function updateModeButtons(){
   modeButtons.forEach(btn=>{
     const mode=btn.dataset.mode;
     const baseText=mode==='mixed'?'Mixed Practice':modeNames[mode];
+    const locked=isJourneyMode && JOURNEY_ORDER.includes(mode) && !isJourneyModeUnlocked(mode);
     btn.classList.toggle('active', mode===currentMode);
+    btn.classList.toggle('locked', locked);
+    btn.disabled=locked;
     if(isJourneyMode && JOURNEY_ORDER.includes(mode)){
       const done=(modeProgress[mode]||0) >= ((journeyQueues?.[mode]?.length) || MODE_TARGETS[mode] || 0);
-      btn.textContent=done?`${baseText} ✓`:baseText;
+      btn.textContent=done?`${baseText} ✓`:(locked?`${baseText} 🔒`:baseText);
     }else{
       btn.textContent=baseText;
     }
@@ -865,7 +887,15 @@ document.getElementById('clearModelBtn').addEventListener('click',clearModel);
 document.getElementById('clearBlanksBtn').addEventListener('click',clearBlanks);
 document.getElementById('checkBtn').addEventListener('click',checkQuestion);
 nextBtn.addEventListener('click',nextQuestion);
-modeButtons.forEach(btn=>btn.addEventListener('click',()=>startMode(btn.dataset.mode,true,false)));
+modeButtons.forEach(btn=>btn.addEventListener('click',()=>{
+  const mode=btn.dataset.mode;
+  if(isJourneyMode){
+    if(!isJourneyModeUnlocked(mode)) return;
+    startMode(mode,false,true);
+    return;
+  }
+  startMode(mode,true,false);
+}));
 document.getElementById('restartBtn').addEventListener('click',()=>startMode(currentMode,true,false));
 document.getElementById('backMixedBtn').addEventListener('click',()=>startMode('mixed',true,false));
 document.getElementById('rewardPlayAgain').addEventListener('click',()=>signalStageComplete(8,true));
