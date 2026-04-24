@@ -612,7 +612,7 @@
 <body>
 
 <div class="fit-viewport" id="fitViewport"><div class="fit-stage" id="fitStage"><div class="page">
-<section class="hero"><div class="hero-top"><div class="title-wrap"><h1>Word Problems (2 Types Mixed)</h1><p>Build the model, place the labels, then fill in the equation blanks.</p></div><div class="scoreboard"><div class="pill" id="modePill">Mode: Mixed</div><div class="pill" id="progressPill">Question 1 / 6</div><div class="pill" id="scorePill">Score: 0</div></div></div><div class="mode-bar"><button class="mode-btn active" data-mode="type1">Type 1</button><button class="mode-btn" data-mode="type2">Type 2</button></div></section>
+<section class="hero"><div class="hero-top"><div class="title-wrap"><h1>Word Problems (2 Types Mixed)</h1><p>Build the model, place the labels, then fill in the equation blanks.</p></div><div class="scoreboard"><div class="pill" id="modePill">Mode: Mixed</div><div class="pill" id="progressPill">Question 1 / 4</div><div class="pill" id="scorePill">Score: 0</div></div></div><div class="mode-bar"><button class="mode-btn active" data-mode="type1">Type 1</button><button class="mode-btn" data-mode="type2">Type 2</button></div></section>
 <div class="mission-card" id="missionCard">
   <div class="mission-top">
     <div class="mission-title" id="missionTitle">Game Journey — Type 1</div>
@@ -620,7 +620,7 @@
   </div>
   <div class="mission-bar"><div class="mission-fill" id="missionFill"></div></div>
   <div class="mission-bottom">
-    <div class="mission-streak" id="missionStreak">Progress streak: 0 of 6</div>
+    <div class="mission-streak" id="missionStreak">Progress streak: 0 of 4</div>
     <div class="mission-stars">
       <div class="mission-star" id="missionStar1">⭐</div>
       <div class="mission-star" id="missionStar2">⭐</div>
@@ -640,7 +640,7 @@
   <div class="reward-box">
     <div class="reward-badge">⭐ Adventure Complete</div>
     <div class="reward-title">King Hullabaloo!</div>
-    <div class="reward-sub" id="rewardText">You completed all 6 questions.</div>
+    <div class="reward-sub" id="rewardText">You completed all 4 questions.</div>
     <img class="reward-pet" src="https://raw.githubusercontent.com/limkimsze-maker/P3_More_Word_Problems_Monster_Quest_Pet_8/33a7ae6e0b4cadb73c2be0f1326d005e2c8d99ef/8%20pet.png" alt="King Hullabaloo">
     <div class="reward-remark">Your pet has evolved into King Hullabaloo!</div>
     <div class="btn-row" style="justify-content:center">
@@ -736,8 +736,8 @@ const QUESTION_BANK={type1:[{id:'t1-1',type:1,typeLabel:'Type 1 — Subtract fir
 
 const ALL_QUESTIONS=[...QUESTION_BANK.type1,...QUESTION_BANK.type2];
 const modeNames={type1:'Type 1',type2:'Type 2'};
-const MODE_TARGETS={type1:3,type2:3};
-const JOURNEY_TARGET=6;
+const MODE_TARGETS={type1:2,type2:2};
+const JOURNEY_TARGET=4;
 const JOURNEY_ORDER=['type1','type2'];
 
 // Free-Practice Auto Unlock:
@@ -799,8 +799,8 @@ function buildJourneyQueues(){
   const t1=shuffle(QUESTION_BANK.type1);
   const t2=shuffle(QUESTION_BANK.type2);
   return {
-    type1:t1.slice(0,3),
-    type2:t2.slice(0,3)
+    type1:t1.slice(0,2),
+    type2:t2.slice(0,2)
   };
 }
 function currentQuestion(){return queue[currentIndex]}
@@ -886,6 +886,9 @@ function startMode(mode, resetScore=true, fromJourney=false){
     queue=(journeyQueues?.[mode] || []);
     currentIndex=0;
     isJourneyMode=true;
+  if(!IS_FREE_PRACTICE){
+    queueStageComplete(8, 1200);
+  }
   }else{
     queue=getModeQuestions(mode);
     currentIndex=0;
@@ -987,6 +990,21 @@ const fitStage=document.getElementById('fitStage'),page=document.querySelector('
   window.addEventListener('load', removeMixed);
   document.addEventListener('DOMContentLoaded', removeMixed);
   removeMixed();
+})();
+</script>
+
+
+<script id="stage8-final-no-mixed-2q-and-completion-patch">
+(function(){
+  function cleanStage8Mixed(){
+    document.querySelectorAll('[data-mode="mixed"]').forEach(function(el){ el.remove(); });
+    document.querySelectorAll('.mode-btn').forEach(function(btn){
+      if((btn.textContent || '').toLowerCase().includes('mixed')) btn.remove();
+    });
+  }
+  document.addEventListener('DOMContentLoaded', cleanStage8Mixed);
+  window.addEventListener('load', cleanStage8Mixed);
+  cleanStage8Mixed();
 })();
 </script>
 
