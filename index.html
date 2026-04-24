@@ -681,6 +681,25 @@ function signalStageComplete(stageNumber, forceMap=false){
   if(stage8CompletionSent) return true;
   stage8CompletionSent=true;
 
+  if(IS_FREE_PRACTICE){
+    try{
+      if(window.parent && window.parent !== window){
+        window.parent.postMessage({
+          type:'monster-quest-return-main',
+          stage:stageNumber,
+          reason:'free-practice-complete'
+        }, '*');
+        return true;
+      }
+    }catch(e){}
+
+    try{
+      window.location.href = 'https://limkimsze-maker.github.io/P3_More_Word_Problems_Monster_Quest_Main_Page/?mq_return=stage' + stageNumber + '&reason=freepractice&ts=' + Date.now();
+      return true;
+    }catch(e){}
+    return false;
+  }
+
   try{
     const key='monsterQuest_highestCompleted';
     const current=Number(localStorage.getItem(key)||0);
@@ -720,6 +739,16 @@ const modeNames={mixed:'Mixed',type1:'Type 1',type2:'Type 2'};
 const MODE_TARGETS={type1:2,type2:2,mixed:2};
 const JOURNEY_TARGET=6;
 const JOURNEY_ORDER=['type1','type2','mixed'];
+
+// Free-Practice Auto Unlock:
+// When this stage is opened from the main page's "Try Any Topic" section,
+// all internal mode buttons are unlocked for practice only. This does not
+// update Monster Quest journey progress on the main map.
+const MQ_STAGE_PARAMS = new URLSearchParams(window.location.search || '');
+const IS_FREE_PRACTICE =
+  MQ_STAGE_PARAMS.get('freepractice') === '1' ||
+  MQ_STAGE_PARAMS.get('tryany') === '1' ||
+  MQ_STAGE_PARAMS.get('practice') === '1';
 
 let currentMode='type1',queue=[],currentIndex=0,score=0,solved=false,modelUnits=0,dragState=null,labelsPlaced={fixed:false,unknown:false,total:false};
 let isJourneyMode=true;
@@ -787,6 +816,7 @@ function getLabelConfig(q){return q.type===1?[{key:'fixed',text:String(q.fixedAm
 function setLabelToolbox(q){labelTools.innerHTML='';getLabelConfig(q).forEach(item=>{const tag=document.createElement('div');tag.className='palette-tag';tag.textContent=item.text;tag.dataset.key=item.key;labelTools.appendChild(tag);tag.addEventListener('pointerdown',e=>{if(solved)return;e.preventDefault();dragState={kind:'tag',key:item.key,text:item.text,ghost:createTagGhost(item.text,e.clientX,e.clientY)}})});labelToolHelp.textContent=q.type===1?'Drag the used amount, the total amount, and the ? 1-unit label onto the correct braces.':'Drag the total amount and the ? label onto the correct braces.'}
 function getJourneyQuestionNumber(){const idx=JOURNEY_ORDER.indexOf(currentMode);return idx<0?currentIndex+1:(idx*2)+currentIndex+1}
 function isJourneyModeUnlocked(mode){
+  if(IS_FREE_PRACTICE) return true;
   if(!isJourneyMode) return true;
   if(mode==='type1') return true;
   const type1Done=(modeProgress.type1||0) >= ((journeyQueues?.type1?.length) || MODE_TARGETS.type1 || 0);
@@ -815,6 +845,17 @@ function updateMissionCard(){
   const total=isJourneyMode?JOURNEY_TARGET:Math.max(queue.length,1);
   const done=isJourneyMode?Math.min(score,JOURNEY_TARGET):Math.min(score,total);
   const currentNo=isJourneyMode?Math.min(getJourneyQuestionNumber(),JOURNEY_TARGET):Math.min(currentIndex+1,total);
+
+  if(IS_FREE_PRACTICE){
+    missionTitle.textContent=`Try Any Topic: ${modeNames[currentMode]} unlocked`;
+    missionMeta.textContent=`Free practice • Question ${currentNo} of ${total}`;
+    missionFill.style.width=total?`${(done/total)*100}%`:'0%';
+    missionStreakEl.textContent=`Practice progress: ${done} of ${total}`;
+    missionStars.forEach((star, idx)=>{star.classList.toggle('on', idx<done);star.style.display=idx<total?'flex':'none'});
+    updateModeButtons();
+    return;
+  }
+
   missionTitle.textContent=isJourneyMode?`Game Journey — ${modeNames[currentMode]}`:`${modeNames[currentMode]} Practice`;
   missionMeta.textContent=done>=total?`Completed ${total} of ${total}`:`Question ${currentNo} of ${total}`;
   missionFill.style.width=total?`${(done/total)*100}%`:'0%';
@@ -823,14 +864,14 @@ function updateMissionCard(){
   updateModeButtons();
 }
 function updatePills(){
-  modePill.textContent=`Mode: ${modeNames[currentMode]}`;
-  if(isJourneyMode){
+  modePill.textContent=IS_FREE_PRACTICE ? `Try Any Topic: ${modeNames[currentMode]}` : `Mode: ${modeNames[currentMode]}`;
+  if(isJourneyMode && !IS_FREE_PRACTICE){
     progressPill.textContent=`Question ${Math.min(getJourneyQuestionNumber(), JOURNEY_TARGET)} / ${JOURNEY_TARGET}`;
     scorePill.textContent=`Score: ${score} / ${JOURNEY_TARGET}`;
   }else{
     const total=Math.max(queue.length,1);
     progressPill.textContent=`Question ${Math.min(currentIndex+1,total)} / ${total}`;
-    scorePill.textContent=`Score: ${score} / ${total}`;
+    scorePill.textContent=IS_FREE_PRACTICE ? `Practice Score: ${score} / ${total}` : `Score: ${score} / ${total}`;
   }
   updateMissionCard();
 }
@@ -851,7 +892,7 @@ function showEndScreen(){gameGrid.style.display='none';rewardScreen.classList.re
 function showRewardScreen(){gameGrid.style.display='none';endScreen.classList.remove('show');rewardScreen.classList.add('show');rewardText.textContent=`You completed all ${JOURNEY_TARGET} questions in the full adventure. Final score: ${score} out of ${JOURNEY_TARGET}.`;updatePills();updateMissionCard();playSound('tada');clearTimeout(stage8CompleteTimer);stage8CompletionSent=false;requestViewportFit()}
 function startMode(mode, resetScore=true, fromJourney=false){
   currentMode=mode;
-  if(fromJourney){
+  if(fromJourney && !IS_FREE_PRACTICE){
     queue=(journeyQueues?.[mode] || []);
     currentIndex=0;
     isJourneyMode=true;
@@ -942,7 +983,7 @@ document.getElementById('rewardPlayAgain').addEventListener('click',()=>signalSt
 document.getElementById('rewardBackMixed').addEventListener('click',()=>{clearTimeout(stage8CompleteTimer);stage8CompletionSent=false;startJourney();});
 
 const workArea=document.getElementById('workArea'),workingCanvas=document.getElementById('workingCanvas');let workingCtx=null,workingDrawing=false,workingLastPoint=null,workingCurrentStroke=null,workingStrokes=[],lastWorkAreaSize={width:0,height:0};function setupWorkingCanvas(forceRedraw=false){if(!workingCanvas||!workArea)return;const width=workArea.clientWidth,height=workArea.clientHeight;if(!width||!height)return;const sizeChanged=width!==lastWorkAreaSize.width||height!==lastWorkAreaSize.height;if(!forceRedraw&&!sizeChanged&&workingCtx)return;const ratio=window.devicePixelRatio||1;workingCanvas.width=Math.round(width*ratio);workingCanvas.height=Math.round(height*ratio);workingCanvas.style.width=`${width}px`;workingCanvas.style.height=`${height}px`;workingCtx=workingCanvas.getContext('2d');workingCtx.setTransform(ratio,0,0,ratio,0,0);workingCtx.lineCap='round';workingCtx.lineJoin='round';workingCtx.lineWidth=3.5;workingCtx.strokeStyle='#4d6270';workingCtx.imageSmoothingEnabled=false;lastWorkAreaSize={width,height};redrawWorking()}function getWorkingPoint(e){const rect=workingCanvas.getBoundingClientRect(),cssW=parseFloat(workingCanvas.style.width)||workingCanvas.clientWidth||rect.width||1,cssH=parseFloat(workingCanvas.style.height)||workingCanvas.clientHeight||rect.height||1,rawX=Math.max(0,Math.min(rect.width,e.clientX-rect.left)),rawY=Math.max(0,Math.min(rect.height,e.clientY-rect.top)),x=rect.width?(rawX*cssW/rect.width):rawX,y=rect.height?(rawY*cssH/rect.height):rawY;return{x,y,nx:cssW?x/cssW:0,ny:cssH?y/cssH:0}}function redrawWorking(){if(!workingCtx)return;const w=parseFloat(workingCanvas.style.width)||0,h=parseFloat(workingCanvas.style.height)||0;workingCtx.clearRect(0,0,w,h);for(const stroke of workingStrokes){if(!stroke.points||!stroke.points.length)continue;workingCtx.beginPath();const first=stroke.points[0];workingCtx.moveTo(first.x*w,first.y*h);for(let i=1;i<stroke.points.length;i++){const pt=stroke.points[i];workingCtx.lineTo(pt.x*w,pt.y*h)}if(stroke.points.length===1)workingCtx.lineTo(first.x*w+.01,first.y*h+.01);workingCtx.stroke()}}function startWorkingDraw(e){setupWorkingCanvas();if(!workingCtx)return;e.preventDefault();workingDrawing=true;workingLastPoint=getWorkingPoint(e);workingCurrentStroke={points:[{x:workingLastPoint.nx,y:workingLastPoint.ny}]};workingStrokes.push(workingCurrentStroke);workingCtx.beginPath();workingCtx.moveTo(workingLastPoint.x,workingLastPoint.y);workingCtx.lineTo(workingLastPoint.x+.01,workingLastPoint.y+.01);workingCtx.stroke()}function moveWorkingDraw(e){if(!workingDrawing||!workingCtx||!workingCurrentStroke)return;e.preventDefault();const pt=getWorkingPoint(e);workingCtx.beginPath();workingCtx.moveTo(workingLastPoint.x,workingLastPoint.y);workingCtx.lineTo(pt.x,pt.y);workingCtx.stroke();workingCurrentStroke.points.push({x:pt.nx,y:pt.ny});workingLastPoint=pt}function stopWorkingDraw(e){if(e&&workingCanvas?.hasPointerCapture?.(e.pointerId))workingCanvas.releasePointerCapture(e.pointerId);workingDrawing=false;workingLastPoint=null;workingCurrentStroke=null}function clearWorking(){workingStrokes=[];if(!workingCtx)return;const w=parseFloat(workingCanvas.style.width)||0,h=parseFloat(workingCanvas.style.height)||0;workingCtx.clearRect(0,0,w,h)}if(workingCanvas){workingCanvas.addEventListener('pointerdown',e=>{workingCanvas.setPointerCapture?.(e.pointerId);startWorkingDraw(e)});workingCanvas.addEventListener('pointermove',moveWorkingDraw);workingCanvas.addEventListener('pointerup',stopWorkingDraw);workingCanvas.addEventListener('pointercancel',stopWorkingDraw);workingCanvas.addEventListener('pointerleave',stopWorkingDraw)}document.getElementById('clearWorkingBtn').addEventListener('click',clearWorking);
-const fitStage=document.getElementById('fitStage'),page=document.querySelector('.page');let fitStageLocked=false;function applyViewportFit(){if(!fitStage||!page)return;fitStage.style.transform='scale(1)';fitStage.style.left='0px';fitStage.style.top='0px';const baseWidth=page.offsetWidth,baseHeight=page.offsetHeight,vw=window.innerWidth,vh=window.innerHeight,scale=Math.min(vw/baseWidth,vh/baseHeight),scaledWidth=baseWidth*scale;fitStage.style.width=`${baseWidth}px`;fitStage.style.height=`${baseHeight}px`;fitStage.style.transform=`scale(${scale})`;fitStage.style.left=`${Math.max(0,(vw-scaledWidth)/2)}px`;fitStage.style.top='0px'}function requestViewportFit(){if(fitStageLocked)return;fitStageLocked=true;requestAnimationFrame(()=>{fitStageLocked=false;applyViewportFit();setupWorkingCanvas(true)})}window.addEventListener('resize',requestViewportFit);window.addEventListener('orientationchange',requestViewportFit);if(window.visualViewport)window.visualViewport.addEventListener('resize',requestViewportFit);const fitObserver=new MutationObserver(requestViewportFit);fitObserver.observe(page,{childList:true,subtree:true,characterData:true,attributes:true});buildPlaceRows();startJourney();requestViewportFit();window.addEventListener('load',requestViewportFit);if(document.fonts&&document.fonts.ready){document.fonts.ready.then(()=>{requestViewportFit();setTimeout(requestViewportFit,60)})}setTimeout(requestViewportFit,120);
+const fitStage=document.getElementById('fitStage'),page=document.querySelector('.page');let fitStageLocked=false;function applyViewportFit(){if(!fitStage||!page)return;fitStage.style.transform='scale(1)';fitStage.style.left='0px';fitStage.style.top='0px';const baseWidth=page.offsetWidth,baseHeight=page.offsetHeight,vw=window.innerWidth,vh=window.innerHeight,scale=Math.min(vw/baseWidth,vh/baseHeight),scaledWidth=baseWidth*scale;fitStage.style.width=`${baseWidth}px`;fitStage.style.height=`${baseHeight}px`;fitStage.style.transform=`scale(${scale})`;fitStage.style.left=`${Math.max(0,(vw-scaledWidth)/2)}px`;fitStage.style.top='0px'}function requestViewportFit(){if(fitStageLocked)return;fitStageLocked=true;requestAnimationFrame(()=>{fitStageLocked=false;applyViewportFit();setupWorkingCanvas(true)})}window.addEventListener('resize',requestViewportFit);window.addEventListener('orientationchange',requestViewportFit);if(window.visualViewport)window.visualViewport.addEventListener('resize',requestViewportFit);const fitObserver=new MutationObserver(requestViewportFit);fitObserver.observe(page,{childList:true,subtree:true,characterData:true,attributes:true});buildPlaceRows();if(IS_FREE_PRACTICE){startMode('mixed', true, false);}else{startJourney();}requestViewportFit();window.addEventListener('load',requestViewportFit);if(document.fonts&&document.fonts.ready){document.fonts.ready.then(()=>{requestViewportFit();setTimeout(requestViewportFit,60)})}setTimeout(requestViewportFit,120);
 </script>
 </body>
 </html>
