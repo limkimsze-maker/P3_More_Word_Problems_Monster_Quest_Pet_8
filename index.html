@@ -572,6 +572,42 @@
   }
 </style>
 
+
+<script id="monster-quest-return-fix-v2">
+(function(){
+  const STAGE_NUMBER = 8;
+  const MAIN_URL = "https://limkimsze-maker.github.io/P3_More_Word_Problems_Monster_Quest_Main_Page/";
+
+  function returnToMonsterQuestMain(){
+    try{
+      if(window.parent && window.parent !== window){
+        window.parent.postMessage({
+          type: "monster-quest-return-main",
+          stage: STAGE_NUMBER,
+          reason: "manual-back"
+        }, "*");
+        return false;
+      }
+    }catch(e){}
+
+    // Fallback only when this stage is opened directly, not inside the hub iframe.
+    try{
+      window.location.href = MAIN_URL + "?mq_return=stage" + STAGE_NUMBER + "&reason=manual&ts=" + Date.now();
+    }catch(e){}
+    return false;
+  }
+
+  document.addEventListener("click", function(e){
+    const btn = e.target && e.target.closest ? e.target.closest(".back-main-btn") : null;
+    if(!btn) return;
+    e.preventDefault();
+    e.stopPropagation();
+    try{ e.stopImmediatePropagation(); }catch(err){}
+    returnToMonsterQuestMain();
+  }, true);
+})();
+</script>
+
 </head>
 <body>
 
@@ -616,10 +652,7 @@
 <section class="card end-screen" id="endScreen"><h2>Great job!</h2><p id="endText"></p><div class="btn-row" style="justify-content:center"><button class="btn primary" id="restartBtn">Play This Mode Again</button><button class="btn secondary" id="backMixedBtn">Go to Mixed Practice</button></div></section>
 <footer>Designed by Lim Kim Sze © 2026</footer>
 
-<a class="back-main-btn"
-   href="https://limkimsze-maker.github.io/P3_More_Word_Problems_Monster_Quest_Main_Page/">
-  Back to Main Page
-</a>
+<a class="back-main-btn" href="#" data-stage-return="8">Back to Main Page</a>
 </div></div></div>
 <script>
 const sounds={
@@ -647,6 +680,7 @@ let stage8CompleteTimer=null;
 function signalStageComplete(stageNumber, forceMap=false){
   if(stage8CompletionSent) return true;
   stage8CompletionSent=true;
+
   try{
     const key='monsterQuest_highestCompleted';
     const current=Number(localStorage.getItem(key)||0);
@@ -668,13 +702,7 @@ function signalStageComplete(stageNumber, forceMap=false){
   }catch(e){}
 
   try{
-    const hubCandidates = [
-      './monster-quest-stage-hub-return-to-map.html?completed=' + stageNumber,
-      './monster-quest-stage-hub.html?completed=' + stageNumber,
-      '../monster-quest-stage-hub-return-to-map.html?completed=' + stageNumber,
-      '../monster-quest-stage-hub.html?completed=' + stageNumber
-    ];
-    window.location.href = hubCandidates[0];
+    window.location.href = 'https://limkimsze-maker.github.io/P3_More_Word_Problems_Monster_Quest_Main_Page/?completed=' + stageNumber + '&ts=' + Date.now();
     return true;
   }catch(e){}
   return false;
