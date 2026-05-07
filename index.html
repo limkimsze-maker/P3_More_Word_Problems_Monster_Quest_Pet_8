@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Word Problems (2 Types Mixed)</title>
+  <title>Word Problems (Type 1 → Type 2)</title>
   <style>
     :root{--bg:#f6fbf1;--card:#ffffff;--ink:#203225;--soft:#5d755f;--green:#9bd56e;--green-dark:#3f7d2a;--mint:#dff4df;--blue:#cfe9ff;--blue-deep:#7eb7e6;--pink:#ffd7d7;--pink-deep:#e69494;--gold:#ffe589;--line:#cfe5c4;--danger:#d85c5c;--ok:#2a9d55;--shadow:0 10px 28px rgba(50,90,50,.10);--unit-w:68px;--unit-h:40px;--radius:18px;--font:"Comic Sans MS","Comic Sans","Trebuchet MS",sans-serif}
     *{box-sizing:border-box}html,body{width:100%;height:100%;margin:0;padding:0;overflow:hidden;background:linear-gradient(180deg,#f4fbef 0%, #edf8ee 100%);color:var(--ink);font-family:var(--font)}body{position:fixed;inset:0;overscroll-behavior:none;touch-action:manipulation}.fit-viewport{position:fixed;inset:0;overflow:hidden;display:flex;justify-content:center;align-items:flex-start;padding-top:2px;background:linear-gradient(180deg,#f4fbef 0%, #edf8ee 100%)}.fit-stage{position:relative;transform-origin:top center;will-change:transform;width:100%}.page{width:calc(100vw - 8px);max-width:none;margin:0 auto;padding:8px 4px 12px}.hero,.card{background:var(--card);border:3px solid var(--line);border-radius:24px;box-shadow:var(--shadow)}.hero{padding:18px;margin-bottom:14px}.hero-top{display:flex;gap:14px;align-items:center;justify-content:space-between;flex-wrap:wrap}.title-wrap h1{margin:0;font-size:clamp(28px,4vw,42px);line-height:1.05;color:var(--green-dark)}.title-wrap p{margin:8px 0 0;font-size:16px;color:var(--soft)}.scoreboard{display:flex;gap:10px;flex-wrap:wrap}.pill{background:#eef8e9;color:var(--green-dark);border:2px solid #cfe5c4;border-radius:999px;padding:10px 14px;font-weight:700;min-width:120px;text-align:center;font-size:16px}.mode-bar{margin-top:14px;display:flex;gap:10px;flex-wrap:wrap}.mode-btn{appearance:none;border:none;background:#e6f4de;color:var(--green-dark);padding:12px 16px;border-radius:14px;font:700 16px var(--font);cursor:pointer;border:2px solid #c9e0bc;box-shadow:0 4px 0 rgba(90,135,75,.12)}    .mode-btn.active{background:var(--green);border-color:#84bf59;transform:translateY(1px)}
@@ -612,7 +612,7 @@
 <body>
 
 <div class="fit-viewport" id="fitViewport"><div class="fit-stage" id="fitStage"><div class="page">
-<section class="hero"><div class="hero-top"><div class="title-wrap"><h1>Word Problems (2 Types Mixed)</h1><p>Build the model, place the labels, then fill in the equation blanks.</p></div><div class="scoreboard"><div class="pill" id="modePill">Mode: Mixed</div><div class="pill" id="progressPill">Question 1 / 4</div><div class="pill" id="scorePill">Score: 0</div></div></div><div class="mode-bar"><button class="mode-btn active" data-mode="type1">Type 1</button><button class="mode-btn" data-mode="type2">Type 2</button></div></section>
+<section class="hero"><div class="hero-top"><div class="title-wrap"><h1>Word Problems (Type 1 → Type 2)</h1><p>Build the model, place the labels, then fill in the equation blanks.</p></div><div class="scoreboard"><div class="pill" id="modePill">Mode: Type 1</div><div class="pill" id="progressPill">Question 1 / 4</div><div class="pill" id="scorePill">Score: 0</div></div></div><div class="mode-bar"><button class="mode-btn active" data-mode="type1">Type 1</button><button class="mode-btn" data-mode="type2">Type 2</button></div></section>
 <div class="mission-card" id="missionCard">
   <div class="mission-top">
     <div class="mission-title" id="missionTitle">Game Journey — Type 1</div>
@@ -679,7 +679,7 @@ function signalStageComplete(stageNumber, forceMap=false){
   if(stage8CompletionSent) return true;
   stage8CompletionSent=true;
 
-  if(IS_FREE_PRACTICE){
+  if(IS_FREE_PRACTICE && !isJourneyMode){
     try{
       if(window.parent && window.parent !== window){
         window.parent.postMessage({
@@ -834,7 +834,7 @@ function updateMissionCard(){
   const done=isJourneyMode?Math.min(score,JOURNEY_TARGET):Math.min(score,total);
   const currentNo=isJourneyMode?Math.min(getJourneyQuestionNumber(),JOURNEY_TARGET):Math.min(currentIndex+1,total);
 
-  if(IS_FREE_PRACTICE){
+  if(IS_FREE_PRACTICE && !isJourneyMode){
     missionTitle.textContent=`Try Any Topic: ${modeNames[currentMode]} unlocked`;
     missionMeta.textContent=`Free practice • Question ${currentNo} of ${total}`;
     missionFill.style.width=total?`${(done/total)*100}%`:'0%';
@@ -852,14 +852,14 @@ function updateMissionCard(){
   updateModeButtons();
 }
 function updatePills(){
-  modePill.textContent=IS_FREE_PRACTICE ? `Try Any Topic: ${modeNames[currentMode]}` : `Mode: ${modeNames[currentMode]}`;
-  if(isJourneyMode && !IS_FREE_PRACTICE){
+  modePill.textContent=(IS_FREE_PRACTICE && !isJourneyMode) ? `Try Any Topic: ${modeNames[currentMode]}` : `Mode: ${modeNames[currentMode]}`;
+  if(isJourneyMode){
     progressPill.textContent=`Question ${Math.min(getJourneyQuestionNumber(), JOURNEY_TARGET)} / ${JOURNEY_TARGET}`;
     scorePill.textContent=`Score: ${score} / ${JOURNEY_TARGET}`;
   }else{
     const total=Math.max(queue.length,1);
     progressPill.textContent=`Question ${Math.min(currentIndex+1,total)} / ${total}`;
-    scorePill.textContent=IS_FREE_PRACTICE ? `Practice Score: ${score} / ${total}` : `Score: ${score} / ${total}`;
+    scorePill.textContent=(IS_FREE_PRACTICE && !isJourneyMode) ? `Practice Score: ${score} / ${total}` : `Score: ${score} / ${total}`;
   }
   updateMissionCard();
 }
@@ -880,7 +880,7 @@ function showEndScreen(){gameGrid.style.display='none';rewardScreen.classList.re
 function showRewardScreen(){gameGrid.style.display='none';endScreen.classList.remove('show');rewardScreen.classList.add('show');rewardText.textContent=`You completed all ${JOURNEY_TARGET} questions in the full adventure. Final score: ${score} out of ${JOURNEY_TARGET}.`;updatePills();updateMissionCard();playSound('tada');clearTimeout(stage8CompleteTimer);stage8CompletionSent=false;requestViewportFit()}
 function startMode(mode, resetScore=true, fromJourney=false){
   currentMode=mode;
-  if(fromJourney && !IS_FREE_PRACTICE){
+  if(fromJourney){
     queue=(journeyQueues?.[mode] || []);
     currentIndex=0;
     isJourneyMode=true;
@@ -971,7 +971,7 @@ document.getElementById('rewardPlayAgain').addEventListener('click',()=>signalSt
 document.getElementById('rewardBackMixed').addEventListener('click',()=>{clearTimeout(stage8CompleteTimer);stage8CompletionSent=false;startJourney();});
 
 const workArea=document.getElementById('workArea'),workingCanvas=document.getElementById('workingCanvas');let workingCtx=null,workingDrawing=false,workingLastPoint=null,workingCurrentStroke=null,workingStrokes=[],lastWorkAreaSize={width:0,height:0};function setupWorkingCanvas(forceRedraw=false){if(!workingCanvas||!workArea)return;const width=workArea.clientWidth,height=workArea.clientHeight;if(!width||!height)return;const sizeChanged=width!==lastWorkAreaSize.width||height!==lastWorkAreaSize.height;if(!forceRedraw&&!sizeChanged&&workingCtx)return;const ratio=window.devicePixelRatio||1;workingCanvas.width=Math.round(width*ratio);workingCanvas.height=Math.round(height*ratio);workingCanvas.style.width=`${width}px`;workingCanvas.style.height=`${height}px`;workingCtx=workingCanvas.getContext('2d');workingCtx.setTransform(ratio,0,0,ratio,0,0);workingCtx.lineCap='round';workingCtx.lineJoin='round';workingCtx.lineWidth=3.5;workingCtx.strokeStyle='#4d6270';workingCtx.imageSmoothingEnabled=false;lastWorkAreaSize={width,height};redrawWorking()}function getWorkingPoint(e){const rect=workingCanvas.getBoundingClientRect(),cssW=parseFloat(workingCanvas.style.width)||workingCanvas.clientWidth||rect.width||1,cssH=parseFloat(workingCanvas.style.height)||workingCanvas.clientHeight||rect.height||1,rawX=Math.max(0,Math.min(rect.width,e.clientX-rect.left)),rawY=Math.max(0,Math.min(rect.height,e.clientY-rect.top)),x=rect.width?(rawX*cssW/rect.width):rawX,y=rect.height?(rawY*cssH/rect.height):rawY;return{x,y,nx:cssW?x/cssW:0,ny:cssH?y/cssH:0}}function redrawWorking(){if(!workingCtx)return;const w=parseFloat(workingCanvas.style.width)||0,h=parseFloat(workingCanvas.style.height)||0;workingCtx.clearRect(0,0,w,h);for(const stroke of workingStrokes){if(!stroke.points||!stroke.points.length)continue;workingCtx.beginPath();const first=stroke.points[0];workingCtx.moveTo(first.x*w,first.y*h);for(let i=1;i<stroke.points.length;i++){const pt=stroke.points[i];workingCtx.lineTo(pt.x*w,pt.y*h)}if(stroke.points.length===1)workingCtx.lineTo(first.x*w+.01,first.y*h+.01);workingCtx.stroke()}}function startWorkingDraw(e){setupWorkingCanvas();if(!workingCtx)return;e.preventDefault();workingDrawing=true;workingLastPoint=getWorkingPoint(e);workingCurrentStroke={points:[{x:workingLastPoint.nx,y:workingLastPoint.ny}]};workingStrokes.push(workingCurrentStroke);workingCtx.beginPath();workingCtx.moveTo(workingLastPoint.x,workingLastPoint.y);workingCtx.lineTo(workingLastPoint.x+.01,workingLastPoint.y+.01);workingCtx.stroke()}function moveWorkingDraw(e){if(!workingDrawing||!workingCtx||!workingCurrentStroke)return;e.preventDefault();const pt=getWorkingPoint(e);workingCtx.beginPath();workingCtx.moveTo(workingLastPoint.x,workingLastPoint.y);workingCtx.lineTo(pt.x,pt.y);workingCtx.stroke();workingCurrentStroke.points.push({x:pt.nx,y:pt.ny});workingLastPoint=pt}function stopWorkingDraw(e){if(e&&workingCanvas?.hasPointerCapture?.(e.pointerId))workingCanvas.releasePointerCapture(e.pointerId);workingDrawing=false;workingLastPoint=null;workingCurrentStroke=null}function clearWorking(){workingStrokes=[];if(!workingCtx)return;const w=parseFloat(workingCanvas.style.width)||0,h=parseFloat(workingCanvas.style.height)||0;workingCtx.clearRect(0,0,w,h)}if(workingCanvas){workingCanvas.addEventListener('pointerdown',e=>{workingCanvas.setPointerCapture?.(e.pointerId);startWorkingDraw(e)});workingCanvas.addEventListener('pointermove',moveWorkingDraw);workingCanvas.addEventListener('pointerup',stopWorkingDraw);workingCanvas.addEventListener('pointercancel',stopWorkingDraw);workingCanvas.addEventListener('pointerleave',stopWorkingDraw)}document.getElementById('clearWorkingBtn').addEventListener('click',clearWorking);
-const fitStage=document.getElementById('fitStage'),page=document.querySelector('.page');let fitStageLocked=false;function applyViewportFit(){if(!fitStage||!page)return;fitStage.style.transform='scale(1)';fitStage.style.left='0px';fitStage.style.top='0px';const baseWidth=page.offsetWidth,baseHeight=page.offsetHeight,vw=window.innerWidth,vh=window.innerHeight,scale=Math.min(vw/baseWidth,vh/baseHeight),scaledWidth=baseWidth*scale;fitStage.style.width=`${baseWidth}px`;fitStage.style.height=`${baseHeight}px`;fitStage.style.transform=`scale(${scale})`;fitStage.style.left=`${Math.max(0,(vw-scaledWidth)/2)}px`;fitStage.style.top='0px'}function requestViewportFit(){if(fitStageLocked)return;fitStageLocked=true;requestAnimationFrame(()=>{fitStageLocked=false;applyViewportFit();setupWorkingCanvas(true)})}window.addEventListener('resize',requestViewportFit);window.addEventListener('orientationchange',requestViewportFit);if(window.visualViewport)window.visualViewport.addEventListener('resize',requestViewportFit);const fitObserver=new MutationObserver(requestViewportFit);fitObserver.observe(page,{childList:true,subtree:true,characterData:true,attributes:true});buildPlaceRows();if(IS_FREE_PRACTICE){startMode('mixed', true, false);}else{startJourney();}requestViewportFit();window.addEventListener('load',requestViewportFit);if(document.fonts&&document.fonts.ready){document.fonts.ready.then(()=>{requestViewportFit();setTimeout(requestViewportFit,60)})}setTimeout(requestViewportFit,120);
+const fitStage=document.getElementById('fitStage'),page=document.querySelector('.page');let fitStageLocked=false;function applyViewportFit(){if(!fitStage||!page)return;fitStage.style.transform='scale(1)';fitStage.style.left='0px';fitStage.style.top='0px';const baseWidth=page.offsetWidth,baseHeight=page.offsetHeight,vw=window.innerWidth,vh=window.innerHeight,scale=Math.min(vw/baseWidth,vh/baseHeight),scaledWidth=baseWidth*scale;fitStage.style.width=`${baseWidth}px`;fitStage.style.height=`${baseHeight}px`;fitStage.style.transform=`scale(${scale})`;fitStage.style.left=`${Math.max(0,(vw-scaledWidth)/2)}px`;fitStage.style.top='0px'}function requestViewportFit(){if(fitStageLocked)return;fitStageLocked=true;requestAnimationFrame(()=>{fitStageLocked=false;applyViewportFit();setupWorkingCanvas(true)})}window.addEventListener('resize',requestViewportFit);window.addEventListener('orientationchange',requestViewportFit);if(window.visualViewport)window.visualViewport.addEventListener('resize',requestViewportFit);const fitObserver=new MutationObserver(requestViewportFit);fitObserver.observe(page,{childList:true,subtree:true,characterData:true,attributes:true});buildPlaceRows();startJourney();requestViewportFit();window.addEventListener('load',requestViewportFit);if(document.fonts&&document.fonts.ready){document.fonts.ready.then(()=>{requestViewportFit();setTimeout(requestViewportFit,60)})}setTimeout(requestViewportFit,120);
 </script>
 
 <script id="stage8-remove-mixed-practice-defensive-patch">
