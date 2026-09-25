@@ -872,6 +872,41 @@
     }
   }
 </style>
+
+  <style id="monster-quest-iframe-mobile-scroll-fix">
+    @media (max-width:1100px){
+      html,body{
+        height:100dvh !important;
+        min-height:0 !important;
+        overflow:hidden !important;
+      }
+      body{
+        padding-bottom:0 !important;
+      }
+      .app{
+        width:100% !important;
+        height:100dvh !important;
+        min-height:0 !important;
+        max-height:100dvh !important;
+        overflow-x:hidden !important;
+        overflow-y:auto !important;
+        -webkit-overflow-scrolling:touch !important;
+        overscroll-behavior-y:contain;
+        touch-action:pan-y;
+        padding-bottom:calc(120px + env(safe-area-inset-bottom)) !important;
+      }
+      .main{
+        overflow:visible !important;
+        flex:none !important;
+      }
+      .footer{
+        margin-bottom:calc(24px + env(safe-area-inset-bottom)) !important;
+      }
+      #toolsCard{
+        scroll-margin-bottom:120px;
+      }
+    }
+  </style>
 </head>
 <body>
 
