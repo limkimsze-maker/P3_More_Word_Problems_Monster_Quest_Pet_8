@@ -1465,7 +1465,16 @@ const JOURNEY_ORDER=['type1','type2'];
 // all internal mode buttons are unlocked for practice only. This does not
 // update Monster Quest journey progress on the main map.
 const MQ_STAGE_PARAMS = new URLSearchParams(window.location.search || '');
+let MQ_SESSION_FREE_PRACTICE = false;
+try{
+const markedStage = sessionStorage.getItem('monsterQuest_freePracticeStage');
+if(markedStage === '8'){
+MQ_SESSION_FREE_PRACTICE = true;
+sessionStorage.removeItem('monsterQuest_freePracticeStage');
+}
+}catch(e){}
 const IS_FREE_PRACTICE =
+  MQ_SESSION_FREE_PRACTICE ||
   MQ_STAGE_PARAMS.get('freepractice') === '1' ||
   MQ_STAGE_PARAMS.get('tryany') === '1' ||
   MQ_STAGE_PARAMS.get('practice') === '1';
