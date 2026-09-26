@@ -907,6 +907,429 @@
       }
     }
   </style>
+
+<script id="stage8-real-phone-detector">
+(function(){
+  function smallestViewport(){
+    const vals=[];
+    try{ if(window.innerWidth) vals.push(window.innerWidth); }catch(e){}
+    try{ if(document.documentElement.clientWidth) vals.push(document.documentElement.clientWidth); }catch(e){}
+    try{ if(window.visualViewport && window.visualViewport.width) vals.push(window.visualViewport.width); }catch(e){}
+    try{ if(window.top && window.top.innerWidth) vals.push(window.top.innerWidth); }catch(e){}
+    try{ if(window.screen && window.screen.width) vals.push(window.screen.width); }catch(e){}
+    return vals.length ? Math.min.apply(null, vals) : 9999;
+  }
+
+  function applyStage8PhoneMode(){
+    document.documentElement.classList.toggle('mq-stage8-phone', smallestViewport() <= 1100);
+  }
+
+  applyStage8PhoneMode();
+  window.addEventListener('resize', applyStage8PhoneMode);
+  window.addEventListener('orientationchange', applyStage8PhoneMode);
+  if(window.visualViewport){
+    window.visualViewport.addEventListener('resize', applyStage8PhoneMode);
+  }
+  try{
+    if(window.top && window.top !== window){
+      window.top.addEventListener('resize', applyStage8PhoneMode);
+    }
+  }catch(e){}
+})();
+</script>
+
+<style id="stage8-match-stage1-mobile-layout">
+  html.mq-stage8-phone,
+  html.mq-stage8-phone body{
+    width:100% !important;
+    height:auto !important;
+    min-height:100% !important;
+    overflow-x:hidden !important;
+    overflow-y:auto !important;
+    -webkit-overflow-scrolling:touch !important;
+  }
+
+  html.mq-stage8-phone body{
+    position:relative !important;
+    inset:auto !important;
+    overscroll-behavior-y:auto !important;
+    touch-action:pan-y !important;
+    padding-bottom:calc(110px + env(safe-area-inset-bottom)) !important;
+  }
+
+  html.mq-stage8-phone .fit-viewport{
+    position:relative !important;
+    inset:auto !important;
+    width:100% !important;
+    height:auto !important;
+    min-height:100dvh !important;
+    overflow:visible !important;
+    display:block !important;
+    padding:0 !important;
+  }
+
+  html.mq-stage8-phone .fit-stage{
+    position:relative !important;
+    left:0 !important;
+    top:0 !important;
+    width:100% !important;
+    height:auto !important;
+    transform:none !important;
+    transform-origin:top left !important;
+  }
+
+  html.mq-stage8-phone .page,
+  html.mq-stage8-phone.main-small-chromebook .page{
+    width:100% !important;
+    max-width:100% !important;
+    min-width:0 !important;
+    margin:0 !important;
+    padding:8px !important;
+  }
+
+  html.mq-stage8-phone .hero{
+    width:100% !important;
+    padding:14px !important;
+    margin-bottom:10px !important;
+    border-radius:22px !important;
+  }
+
+  html.mq-stage8-phone .hero-top{
+    align-items:flex-start !important;
+  }
+
+  html.mq-stage8-phone .title-wrap h1{
+    font-size:28px !important;
+    line-height:1.1 !important;
+  }
+
+  html.mq-stage8-phone .title-wrap p{
+    font-size:16px !important;
+    line-height:1.35 !important;
+  }
+
+  html.mq-stage8-phone .scoreboard{
+    width:100% !important;
+    gap:6px !important;
+  }
+
+  html.mq-stage8-phone .pill{
+    min-width:0 !important;
+    flex:1 1 105px !important;
+    padding:8px 10px !important;
+    font-size:15px !important;
+  }
+
+  html.mq-stage8-phone .mode-bar{
+    gap:6px !important;
+  }
+
+  html.mq-stage8-phone .mode-btn{
+    flex:1 1 110px !important;
+    font-size:16px !important;
+    padding:10px 8px !important;
+  }
+
+  html.mq-stage8-phone .mission-card{
+    padding:10px !important;
+    margin-bottom:10px !important;
+  }
+
+  html.mq-stage8-phone .mission-stars{
+    gap:4px !important;
+    flex-wrap:wrap !important;
+  }
+
+  html.mq-stage8-phone .mission-star{
+    width:28px !important;
+    height:28px !important;
+    font-size:15px !important;
+  }
+
+  /* Model -> Units & Equations -> Working Space */
+  html.mq-stage8-phone .main-grid{
+    display:grid !important;
+    grid-template-columns:minmax(0,1fr) !important;
+    gap:12px !important;
+    width:100% !important;
+    align-items:start !important;
+  }
+
+  html.mq-stage8-phone .card,
+  html.mq-stage8-phone .panel-card,
+  html.mq-stage8-phone .work-card{
+    width:100% !important;
+    max-width:100% !important;
+    min-width:0 !important;
+    min-height:0 !important;
+    height:auto !important;
+    padding:12px !important;
+    overflow:visible !important;
+  }
+
+  html.mq-stage8-phone #modelCard{order:1 !important;}
+  html.mq-stage8-phone #toolCard{order:2 !important;}
+  html.mq-stage8-phone #workCard{order:3 !important;}
+
+  html.mq-stage8-phone .type-badge{
+    font-size:17px !important;
+    line-height:1.25 !important;
+    padding:8px 10px !important;
+  }
+
+  html.mq-stage8-phone .question-text{
+    font-size:21px !important;
+    line-height:1.38 !important;
+  }
+
+  html.mq-stage8-phone .mini-note,
+  html.mq-stage8-phone .tool-note,
+  html.mq-stage8-phone .work-note,
+  html.mq-stage8-phone .builder-note,
+  html.mq-stage8-phone #labelToolHelp{
+    font-size:15px !important;
+    line-height:1.35 !important;
+  }
+
+  /* Keep all bar units and brace targets within the phone card. */
+  html.mq-stage8-phone{
+    --unit-w:clamp(32px,9vw,38px);
+    --unit-h:34px;
+  }
+
+  html.mq-stage8-phone .model-area{
+    width:100% !important;
+    margin-top:4px !important;
+    padding-bottom:4px !important;
+    gap:4px !important;
+  }
+
+  html.mq-stage8-phone .model-shell{
+    min-height:250px !important;
+    padding-top:8px !important;
+  }
+
+  html.mq-stage8-phone .model-row{
+    gap:8px !important;
+    margin-bottom:8px !important;
+  }
+
+  html.mq-stage8-phone .row-label{
+    width:82px !important;
+    min-width:82px !important;
+    min-height:42px !important;
+    padding:7px 5px !important;
+    font-size:17px !important;
+    line-height:1.15 !important;
+    text-align:center !important;
+  }
+
+  html.mq-stage8-phone .bar-wrap{
+    min-width:0 !important;
+    min-height:120px !important;
+    overflow:visible !important;
+  }
+
+  html.mq-stage8-phone .bar-stage{
+    min-height:120px !important;
+    padding-top:48px !important;
+    padding-bottom:38px !important;
+    overflow:visible !important;
+  }
+
+  html.mq-stage8-phone .bar-zone{
+    min-height:52px !important;
+    padding:7px 6px !important;
+    border-radius:14px !important;
+    max-width:100% !important;
+  }
+
+  html.mq-stage8-phone .slot{
+    height:34px !important;
+  }
+
+  html.mq-stage8-phone .label-target{
+    width:52px !important;
+    min-width:52px !important;
+    height:30px !important;
+    min-height:30px !important;
+  }
+
+  html.mq-stage8-phone .placed-tag{
+    font-size:16px !important;
+    padding:0 4px !important;
+  }
+
+  html.mq-stage8-phone .brace-path{
+    stroke-width:2.2 !important;
+  }
+
+  html.mq-stage8-phone .model-row.bottom-tight{
+    margin-top:0 !important;
+  }
+
+  html.mq-stage8-phone .tool-shell,
+  html.mq-stage8-phone .toolbox,
+  html.mq-stage8-phone .equation-wrap,
+  html.mq-stage8-phone .subpanel{
+    width:100% !important;
+    min-width:0 !important;
+  }
+
+  html.mq-stage8-phone .subpanel{
+    padding:10px !important;
+  }
+
+  html.mq-stage8-phone .palette-unit,
+  html.mq-stage8-phone .ghost-unit{
+    width:76px !important;
+    height:48px !important;
+    font-size:15px !important;
+  }
+
+  html.mq-stage8-phone .palette-tag,
+  html.mq-stage8-phone .ghost-tag{
+    min-width:68px !important;
+    height:42px !important;
+    padding:0 9px !important;
+    font-size:15px !important;
+  }
+
+  /* Keep equations horizontal as far as possible. */
+  html.mq-stage8-phone .eq-line{
+    width:100% !important;
+    max-width:100% !important;
+    flex-wrap:nowrap !important;
+    gap:4px !important;
+    font-size:16px !important;
+    line-height:1.35 !important;
+    overflow-x:auto !important;
+    -webkit-overflow-scrolling:touch !important;
+    padding-bottom:3px !important;
+  }
+
+  html.mq-stage8-phone .eq-chip{
+    flex:0 0 auto !important;
+    min-height:36px !important;
+    padding:5px 8px !important;
+    font-size:15px !important;
+  }
+
+  html.mq-stage8-phone .eq-symbol-stack{
+    width:16px !important;
+    min-width:16px !important;
+  }
+
+  html.mq-stage8-phone .blank{
+    width:58px !important;
+    min-width:58px !important;
+    height:38px !important;
+    padding:3px 4px !important;
+    font-size:16px !important;
+    flex:0 0 58px !important;
+  }
+
+  html.mq-stage8-phone .blank.small{
+    width:52px !important;
+    min-width:52px !important;
+    flex-basis:52px !important;
+  }
+
+  html.mq-stage8-phone .op-circle{
+    width:34px !important;
+    min-width:34px !important;
+    height:34px !important;
+    font-size:20px !important;
+    flex:0 0 34px !important;
+  }
+
+  /* Full-width writable Working Space underneath. */
+  html.mq-stage8-phone #workCard{
+    min-height:560px !important;
+    margin-bottom:calc(70px + env(safe-area-inset-bottom)) !important;
+  }
+
+  html.mq-stage8-phone .work-head{
+    margin-bottom:8px !important;
+  }
+
+  html.mq-stage8-phone .work-area{
+    width:100% !important;
+    min-height:430px !important;
+    height:430px !important;
+    flex:0 0 430px !important;
+    overflow:hidden !important;
+    --hto-left:18px !important;
+  }
+
+  html.mq-stage8-phone #workingCanvas{
+    width:100% !important;
+    height:100% !important;
+    touch-action:none !important;
+  }
+
+  html.mq-stage8-phone .place-head{
+    left:18px !important;
+  }
+
+  html.mq-stage8-phone .place-grid > .place-vert:nth-of-type(2){left:18px !important;}
+  html.mq-stage8-phone .place-grid > .place-vert:nth-of-type(3){left:74px !important;}
+  html.mq-stage8-phone .place-grid > .place-vert:nth-of-type(4){left:130px !important;}
+  html.mq-stage8-phone .place-grid > .place-vert:nth-of-type(5){left:186px !important;}
+
+  /* King Hullabaloo appears only after the adventure is complete. */
+  html.mq-stage8-phone .reward-screen:not(.show){
+    display:none !important;
+  }
+
+  html.mq-stage8-phone .reward-screen.show{
+    display:flex !important;
+    width:100% !important;
+    max-width:100% !important;
+    min-height:0 !important;
+    padding:14px !important;
+  }
+
+  html.mq-stage8-phone .reward-box{
+    width:100% !important;
+    max-width:100% !important;
+    padding:16px !important;
+  }
+
+  html.mq-stage8-phone .reward-title{
+    font-size:32px !important;
+  }
+
+  html.mq-stage8-phone .reward-sub,
+  html.mq-stage8-phone .reward-remark{
+    font-size:18px !important;
+  }
+
+  html.mq-stage8-phone .reward-pet{
+    max-width:260px !important;
+  }
+
+  html.mq-stage8-phone .end-screen{
+    width:100% !important;
+    max-width:100% !important;
+  }
+
+  html.mq-stage8-phone .back-main-btn{
+    position:fixed !important;
+    right:6px !important;
+    bottom:calc(78px + env(safe-area-inset-bottom)) !important;
+    padding:4px 7px !important;
+    font-size:9px !important;
+    border-width:1.5px !important;
+    opacity:.78 !important;
+    box-shadow:0 2px 6px rgba(0,0,0,.14) !important;
+  }
+
+  html.mq-stage8-phone footer{
+    margin-bottom:calc(24px + env(safe-area-inset-bottom)) !important;
+  }
+</style>
+
 </head>
 <body>
 
@@ -1203,6 +1626,7 @@ function startJourney(){
 }
 function nextQuestion(){
   if(!solved)return;
+  clearWorking();
   if(isJourneyMode){
     modeProgress[currentMode]=Math.max(modeProgress[currentMode], currentIndex+1);
     if(currentIndex>=queue.length-1){
@@ -1269,8 +1693,8 @@ document.getElementById('restartBtn').addEventListener('click',()=>startMode(cur
 document.getElementById('rewardPlayAgain').addEventListener('click',()=>signalStageComplete(8));
 document.getElementById('rewardBackMixed').addEventListener('click',()=>{clearTimeout(stage8CompleteTimer);stage8CompletionSent=false;startJourney();});
 
-const workArea=document.getElementById('workArea'),workingCanvas=document.getElementById('workingCanvas');let workingCtx=null,workingDrawing=false,workingLastPoint=null,workingCurrentStroke=null,workingStrokes=[],lastWorkAreaSize={width:0,height:0};function setupWorkingCanvas(forceRedraw=false){if(!workingCanvas||!workArea)return;const width=workArea.clientWidth,height=workArea.clientHeight;if(!width||!height)return;const sizeChanged=width!==lastWorkAreaSize.width||height!==lastWorkAreaSize.height;if(!forceRedraw&&!sizeChanged&&workingCtx)return;const ratio=window.devicePixelRatio||1;workingCanvas.width=Math.round(width*ratio);workingCanvas.height=Math.round(height*ratio);workingCanvas.style.width=`${width}px`;workingCanvas.style.height=`${height}px`;workingCtx=workingCanvas.getContext('2d');workingCtx.setTransform(ratio,0,0,ratio,0,0);workingCtx.lineCap='round';workingCtx.lineJoin='round';workingCtx.lineWidth=3.5;workingCtx.strokeStyle='#4d6270';workingCtx.imageSmoothingEnabled=false;lastWorkAreaSize={width,height};redrawWorking()}function getWorkingPoint(e){const rect=workingCanvas.getBoundingClientRect(),cssW=parseFloat(workingCanvas.style.width)||workingCanvas.clientWidth||rect.width||1,cssH=parseFloat(workingCanvas.style.height)||workingCanvas.clientHeight||rect.height||1,rawX=Math.max(0,Math.min(rect.width,e.clientX-rect.left)),rawY=Math.max(0,Math.min(rect.height,e.clientY-rect.top)),x=rect.width?(rawX*cssW/rect.width):rawX,y=rect.height?(rawY*cssH/rect.height):rawY;return{x,y,nx:cssW?x/cssW:0,ny:cssH?y/cssH:0}}function redrawWorking(){if(!workingCtx)return;const w=parseFloat(workingCanvas.style.width)||0,h=parseFloat(workingCanvas.style.height)||0;workingCtx.clearRect(0,0,w,h);for(const stroke of workingStrokes){if(!stroke.points||!stroke.points.length)continue;workingCtx.beginPath();const first=stroke.points[0];workingCtx.moveTo(first.x*w,first.y*h);for(let i=1;i<stroke.points.length;i++){const pt=stroke.points[i];workingCtx.lineTo(pt.x*w,pt.y*h)}if(stroke.points.length===1)workingCtx.lineTo(first.x*w+.01,first.y*h+.01);workingCtx.stroke()}}function startWorkingDraw(e){setupWorkingCanvas();if(!workingCtx)return;e.preventDefault();workingDrawing=true;workingLastPoint=getWorkingPoint(e);workingCurrentStroke={points:[{x:workingLastPoint.nx,y:workingLastPoint.ny}]};workingStrokes.push(workingCurrentStroke);workingCtx.beginPath();workingCtx.moveTo(workingLastPoint.x,workingLastPoint.y);workingCtx.lineTo(workingLastPoint.x+.01,workingLastPoint.y+.01);workingCtx.stroke()}function moveWorkingDraw(e){if(!workingDrawing||!workingCtx||!workingCurrentStroke)return;e.preventDefault();const pt=getWorkingPoint(e);workingCtx.beginPath();workingCtx.moveTo(workingLastPoint.x,workingLastPoint.y);workingCtx.lineTo(pt.x,pt.y);workingCtx.stroke();workingCurrentStroke.points.push({x:pt.nx,y:pt.ny});workingLastPoint=pt}function stopWorkingDraw(e){if(e&&workingCanvas?.hasPointerCapture?.(e.pointerId))workingCanvas.releasePointerCapture(e.pointerId);workingDrawing=false;workingLastPoint=null;workingCurrentStroke=null}function clearWorking(){workingStrokes=[];if(!workingCtx)return;const w=parseFloat(workingCanvas.style.width)||0,h=parseFloat(workingCanvas.style.height)||0;workingCtx.clearRect(0,0,w,h)}if(workingCanvas){workingCanvas.addEventListener('pointerdown',e=>{workingCanvas.setPointerCapture?.(e.pointerId);startWorkingDraw(e)});workingCanvas.addEventListener('pointermove',moveWorkingDraw);workingCanvas.addEventListener('pointerup',stopWorkingDraw);workingCanvas.addEventListener('pointercancel',stopWorkingDraw);workingCanvas.addEventListener('pointerleave',stopWorkingDraw)}document.getElementById('clearWorkingBtn').addEventListener('click',clearWorking);
-const fitStage=document.getElementById('fitStage'),page=document.querySelector('.page');let fitStageLocked=false;function applyViewportFit(){if(!fitStage||!page)return;fitStage.style.transform='scale(1)';fitStage.style.left='0px';fitStage.style.top='0px';const baseWidth=page.offsetWidth,baseHeight=page.offsetHeight,vw=window.innerWidth,vh=window.innerHeight,scale=Math.min(vw/baseWidth,vh/baseHeight),scaledWidth=baseWidth*scale;fitStage.style.width=`${baseWidth}px`;fitStage.style.height=`${baseHeight}px`;fitStage.style.transform=`scale(${scale})`;fitStage.style.left=`${Math.max(0,(vw-scaledWidth)/2)}px`;fitStage.style.top='0px'}function requestViewportFit(){if(fitStageLocked)return;fitStageLocked=true;requestAnimationFrame(()=>{fitStageLocked=false;applyViewportFit();setupWorkingCanvas(true)})}window.addEventListener('resize',requestViewportFit);window.addEventListener('orientationchange',requestViewportFit);if(window.visualViewport)window.visualViewport.addEventListener('resize',requestViewportFit);const fitObserver=new MutationObserver(requestViewportFit);fitObserver.observe(page,{childList:true,subtree:true,characterData:true,attributes:true});buildPlaceRows();
+const workArea=document.getElementById('workArea'),workingCanvas=document.getElementById('workingCanvas');let workingCtx=null,workingDrawing=false,workingLastPoint=null,workingCurrentStroke=null,workingStrokes=[],lastWorkAreaSize={width:0,height:0};function setupWorkingCanvas(forceRedraw=false){if(!workingCanvas||!workArea)return;const width=workArea.clientWidth,height=workArea.clientHeight;if(!width||!height)return;const sizeChanged=width!==lastWorkAreaSize.width||height!==lastWorkAreaSize.height;if(!forceRedraw&&!sizeChanged&&workingCtx)return;const ratio=window.devicePixelRatio||1;workingCanvas.width=Math.round(width*ratio);workingCanvas.height=Math.round(height*ratio);workingCanvas.style.width=`${width}px`;workingCanvas.style.height=`${height}px`;workingCtx=workingCanvas.getContext('2d');workingCtx.setTransform(ratio,0,0,ratio,0,0);workingCtx.lineCap='round';workingCtx.lineJoin='round';workingCtx.lineWidth=3.5;workingCtx.strokeStyle='#4d6270';workingCtx.imageSmoothingEnabled=false;lastWorkAreaSize={width,height};redrawWorking()}function getWorkingPoint(e){const rect=workingCanvas.getBoundingClientRect(),cssW=parseFloat(workingCanvas.style.width)||workingCanvas.clientWidth||rect.width||1,cssH=parseFloat(workingCanvas.style.height)||workingCanvas.clientHeight||rect.height||1,rawX=Math.max(0,Math.min(rect.width,e.clientX-rect.left)),rawY=Math.max(0,Math.min(rect.height,e.clientY-rect.top)),x=rect.width?(rawX*cssW/rect.width):rawX,y=rect.height?(rawY*cssH/rect.height):rawY;return{x,y,nx:cssW?x/cssW:0,ny:cssH?y/cssH:0}}function redrawWorking(){if(!workingCtx)return;const w=parseFloat(workingCanvas.style.width)||0,h=parseFloat(workingCanvas.style.height)||0;workingCtx.clearRect(0,0,w,h);for(const stroke of workingStrokes){if(!stroke.points||!stroke.points.length)continue;workingCtx.beginPath();const first=stroke.points[0];workingCtx.moveTo(first.x*w,first.y*h);for(let i=1;i<stroke.points.length;i++){const pt=stroke.points[i];workingCtx.lineTo(pt.x*w,pt.y*h)}if(stroke.points.length===1)workingCtx.lineTo(first.x*w+.01,first.y*h+.01);workingCtx.stroke()}}function startWorkingDraw(e){setupWorkingCanvas();if(!workingCtx)return;e.preventDefault();workingDrawing=true;workingLastPoint=getWorkingPoint(e);workingCurrentStroke={points:[{x:workingLastPoint.nx,y:workingLastPoint.ny}]};workingStrokes.push(workingCurrentStroke);workingCtx.beginPath();workingCtx.moveTo(workingLastPoint.x,workingLastPoint.y);workingCtx.lineTo(workingLastPoint.x+.01,workingLastPoint.y+.01);workingCtx.stroke()}function moveWorkingDraw(e){if(!workingDrawing||!workingCtx||!workingCurrentStroke)return;e.preventDefault();const pt=getWorkingPoint(e);workingCtx.beginPath();workingCtx.moveTo(workingLastPoint.x,workingLastPoint.y);workingCtx.lineTo(pt.x,pt.y);workingCtx.stroke();workingCurrentStroke.points.push({x:pt.nx,y:pt.ny});workingLastPoint=pt}function stopWorkingDraw(e){if(e&&workingCanvas?.hasPointerCapture?.(e.pointerId))workingCanvas.releasePointerCapture(e.pointerId);workingDrawing=false;workingLastPoint=null;workingCurrentStroke=null}function clearWorking(){workingDrawing=false;workingLastPoint=null;workingCurrentStroke=null;workingStrokes=[];if(!workingCtx)return;const w=parseFloat(workingCanvas.style.width)||0,h=parseFloat(workingCanvas.style.height)||0;workingCtx.clearRect(0,0,w,h)}if(workingCanvas){workingCanvas.addEventListener('pointerdown',e=>{workingCanvas.setPointerCapture?.(e.pointerId);startWorkingDraw(e)});workingCanvas.addEventListener('pointermove',moveWorkingDraw);workingCanvas.addEventListener('pointerup',stopWorkingDraw);workingCanvas.addEventListener('pointercancel',stopWorkingDraw);workingCanvas.addEventListener('pointerleave',stopWorkingDraw)}document.getElementById('clearWorkingBtn').addEventListener('click',clearWorking);
+const fitStage=document.getElementById('fitStage'),page=document.querySelector('.page');let fitStageLocked=false;function applyViewportFit(){if(!fitStage||!page)return;if(document.documentElement.classList.contains('mq-stage8-phone')){fitStage.style.transform='none';fitStage.style.left='0px';fitStage.style.top='0px';fitStage.style.width='100%';fitStage.style.height='auto';return;}fitStage.style.transform='scale(1)';fitStage.style.left='0px';fitStage.style.top='0px';const baseWidth=page.offsetWidth,baseHeight=page.offsetHeight,vw=window.innerWidth,vh=window.innerHeight,scale=Math.min(vw/baseWidth,vh/baseHeight),scaledWidth=baseWidth*scale;fitStage.style.width=`${baseWidth}px`;fitStage.style.height=`${baseHeight}px`;fitStage.style.transform=`scale(${scale})`;fitStage.style.left=`${Math.max(0,(vw-scaledWidth)/2)}px`;fitStage.style.top='0px'}function requestViewportFit(){if(fitStageLocked)return;fitStageLocked=true;requestAnimationFrame(()=>{fitStageLocked=false;applyViewportFit();setupWorkingCanvas(true)})}window.addEventListener('resize',requestViewportFit);window.addEventListener('orientationchange',requestViewportFit);if(window.visualViewport)window.visualViewport.addEventListener('resize',requestViewportFit);const fitObserver=new MutationObserver(requestViewportFit);fitObserver.observe(page,{childList:true,subtree:true,characterData:true,attributes:true});buildPlaceRows();
 if(IS_FREE_PRACTICE){
   startMode('type1', true, false);
 }else{
